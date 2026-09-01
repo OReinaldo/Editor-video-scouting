@@ -3,94 +3,119 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Suite de Scouting & Análisis Táctico - MVP v1</title>
+  <title>Editor & Scouting Tactical Suite - MVP v1.1</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    .tab-active { border-bottom: 3px solid #3b82f6; color: #3b82f6; font-weight: 700; }
     canvas { pointer-events: auto; }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans antialiased h-screen flex flex-col">
+<body class="bg-slate-900 text-slate-100 font-sans antialiased h-screen flex flex-col overflow-hidden">
 
-  <!-- BARRA SUPERIOR / HEADER -->
-  <header class="bg-slate-800 border-b border-slate-700 px-6 py-3 flex items-center justify-between shrink-0">
-    <div class="flex items-center space-x-3">
-      <div class="bg-blue-600 text-white p-2 rounded-lg font-bold">ST</div>
-      <div>
-        <h1 class="font-bold text-lg leading-tight">Scouting Tactical Suite</h1>
-        <p class="text-xs text-slate-400">Entorno de Análisis Local-First • Beta v1.0</p>
+  <!-- BARRA SUPERIOR Y NAVEGACIÓN DE PESTAÑAS -->
+  <header class="bg-slate-800 border-b border-slate-700 px-6 py-2 flex items-center justify-between shrink-0">
+    <div class="flex items-center space-x-6">
+      <div class="flex items-center space-x-2">
+        <div class="bg-blue-600 text-white p-2 rounded-lg font-bold text-sm">ST</div>
+        <div>
+          <h1 class="font-bold text-base leading-tight">Scouting Tactical Suite</h1>
+          <p class="text-xs text-slate-400">Local-First Engine • Beta v1.1</p>
+        </div>
       </div>
+
+      <!-- PESTAÑAS -->
+      <nav class="flex space-x-4 text-sm font-medium text-slate-400 ml-6">
+        <button onclick="switchTab('editor')" id="tab-editor" class="py-3 px-2 tab-active">🎬 1. Edición de Vídeo</button>
+        <button onclick="switchTab('report')" id="tab-report" class="py-3 px-2 hover:text-slate-200">📋 2. Creador de Informes</button>
+      </nav>
     </div>
+
+    <!-- CARGA DE VÍDEO -->
     <div class="flex items-center space-x-3">
       <input type="file" id="videoInput" accept="video/mp4,video/quicktime,video/mov,video/mkv,video/*,.mp4,.mov,.mkv" class="hidden" onchange="loadVideo(event)">
-      <button onclick="document.getElementById('videoInput').click()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition flex items-center gap-2">
-        📂 Cargar Vídeo del Partido
+      <button onclick="document.getElementById('videoInput').click()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-2 rounded-lg transition flex items-center gap-2">
+        📂 Cargar Vídeo Partido (.MP4 / .MOV)
       </button>
     </div>
   </header>
- 
-  <!-- CONTENIDO PRINCIPAL -->
-  <div class="flex-1 flex overflow-hidden">
+
+  <!-- PESTAÑA 1: EDICIÓN DE VÍDEO -->
+  <div id="view-editor" class="flex-1 flex overflow-hidden">
     
-    <!-- ÁREA DEL REPRODUCTOR Y LIENZO TÁCTICO -->
+    <!-- ÁREA CENTRAL: REPRODUCTOR Y CANVASTÁCTICO -->
     <main class="flex-1 flex flex-col bg-black relative justify-center items-center overflow-hidden">
-      
-      <!-- CONTENEDOR DE VÍDEO + CANVAS OVERLAY -->
       <div id="mediaContainer" class="relative max-w-full max-h-full aspect-video flex items-center justify-center bg-slate-950">
         <video id="videoPlayer" class="w-full h-full object-contain" ontimeupdate="updateProgress()"></video>
         <canvas id="tacticalCanvas" class="absolute top-0 left-0 w-full h-full cursor-crosshair"></canvas>
       </div>
 
-      <!-- PANEL DE CONTROL FLOTANTE DEL VÍDEO -->
-      <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-slate-800/90 backdrop-blur border border-slate-700 p-3 rounded-xl shadow-2xl flex items-center gap-4 w-11/12 max-w-3xl">
-        
-        <button onclick="togglePlay()" id="playBtn" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-bold text-sm">▶ Play</button>
+      <!-- CONTROLES Y TIMELINE -->
+      <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-slate-800/95 border border-slate-700 p-3 rounded-xl shadow-2xl flex items-center gap-4 w-11/12 max-w-4xl">
+        <button onclick="togglePlay()" id="playBtn" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-bold text-xs">▶ Play</button>
         
         <div class="flex-1 flex flex-col gap-1">
           <input type="range" id="seekBar" value="0" min="0" max="100" step="0.1" oninput="seekVideo()" class="w-full accent-blue-500 cursor-pointer h-2 bg-slate-700 rounded-lg">
-          <div class="flex justify-between text-xs text-slate-400 font-mono">
+          <div class="flex justify-between text-[10px] text-slate-400 font-mono">
             <span id="currentTime">00:00</span>
             <span id="durationTime">00:00</span>
           </div>
         </div>
 
-        <!-- CONTROLES DE MARCADOR IN/OUT -->
-        <div class="flex items-center gap-2 border-l border-slate-700 pl-4">
-          <button onclick="setPoint('in')" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded text-xs font-semibold">Punto IN [I]</button>
-          <button onclick="setPoint('out')" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded text-xs font-semibold">Punto OUT [O]</button>
+        <div class="flex items-center gap-2 border-l border-slate-700 pl-3">
+          <button onclick="setPoint('in')" class="bg-slate-700 hover:bg-slate-600 px-2.5 py-1.5 rounded text-xs font-semibold">Punto IN [I]</button>
+          <button onclick="setPoint('out')" class="bg-slate-700 hover:bg-slate-600 px-2.5 py-1.5 rounded text-xs font-semibold">Punto OUT [O]</button>
           <button onclick="saveClip()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded text-xs font-bold">💾 Guardar Corte</button>
         </div>
       </div>
     </main>
 
-    <!-- PANEL LATERAL: HERRAMIENTAS Y BIBLIOTECA DE CORTES -->
+    <!-- PANEL LATERAL: DIBUJO Y CORTES -->
     <aside class="w-80 bg-slate-800 border-l border-slate-700 flex flex-col shrink-0">
       
-      <!-- HERRAMIENTAS DE DIBUJO TÁCTICO -->
+      <!-- HERRAMIENTAS DE DIBUJO -->
       <div class="p-4 border-b border-slate-700">
         <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Herramientas Tácticas</h2>
         <div class="grid grid-cols-2 gap-2">
-          <button onclick="setTool('arrow')" id="toolArrow" class="bg-slate-700 hover:bg-slate-600 p-2 rounded text-xs font-medium flex items-center gap-2">
-            ↗️ Flecha Carrera
-          </button>
-          <button onclick="setTool('spotlight')" id="toolSpot" class="bg-slate-700 hover:bg-slate-600 p-2 rounded text-xs font-medium flex items-center gap-2">
-            💡 Foco Jugador
-          </button>
+          <button onclick="setTool('arrow')" id="toolArrow" class="bg-blue-600 p-2 rounded text-xs font-medium flex items-center justify-center gap-1">↗️ Flecha</button>
+          <button onclick="setTool('spotlight')" id="toolSpot" class="bg-slate-700 hover:bg-slate-600 p-2 rounded text-xs font-medium flex items-center justify-center gap-1">💡 Foco Jugador</button>
         </div>
+        <button onclick="clearCanvas()" class="w-full mt-2 bg-slate-700/50 hover:bg-red-600/30 text-red-400 border border-red-500/30 p-1.5 rounded text-xs">🗑️ Limpiar Dibujos</button>
       </div>
 
       <!-- BIBLIOTECA DE CORTES -->
       <div class="flex-1 p-4 overflow-y-auto">
         <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Cortes del Proyecto</h2>
         <div id="clipsList" class="space-y-2">
-          <p class="text-xs text-slate-500 italic">No hay cortes creados todavía. Selecciona un punto IN y OUT y pulsa "Guardar Corte".</p>
+          <p class="text-xs text-slate-500 italic">No hay cortes guardados. Selecciona IN/OUT y pulsa "Guardar Corte".</p>
         </div>
       </div>
-
     </aside>
-
   </div>
 
-  <!-- SCRIPT DE LÓGICA DE FUNCIONAMIENTO -->
+  <!-- PESTAÑA 2: CREADOR DE INFORMES -->
+  <div id="view-report" class="flex-1 hidden bg-slate-900 p-8 overflow-y-auto">
+    <div class="max-w-4xl mx-auto space-y-6">
+      
+      <div class="flex justify-between items-center border-b border-slate-700 pb-4">
+        <div>
+          <h2 class="text-xl font-bold text-white">Informe Táctico del Partido</h2>
+          <p class="text-xs text-slate-400">Añade bloques de análisis e integra los cortes creados en el editor.</p>
+        </div>
+        <button onclick="addReportBlock()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2">
+          ➕ Añadir Bloque Táctico
+        </button>
+      </div>
+
+      <!-- CONTENEDOR DE BLOQUES -->
+      <div id="reportBlocksContainer" class="space-y-4">
+        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 text-center text-slate-500 text-sm">
+          No has añadido ningún bloque al informe. Pulsa el botón <strong>"Añadir Bloque Táctico"</strong> para empezar.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT DE LÓGICA -->
   <script>
     const video = document.getElementById('videoPlayer');
     const canvas = document.getElementById('tacticalCanvas');
@@ -102,126 +127,155 @@
     let isDrawing = false;
     let startX, startY;
     let clips = [];
+    let reportBlocks = [];
 
-    // Ajustar resolución del Canvas
+    // Cambiar Pestañas
+    function switchTab(tab) {
+      document.getElementById('view-editor').classList.toggle('hidden', tab !== 'editor');
+      document.getElementById('view-report').classList.toggle('hidden', tab !== 'report');
+      document.getElementById('tab-editor').className = tab === 'editor' ? 'py-3 px-2 tab-active' : 'py-3 px-2 hover:text-slate-200';
+      document.getElementById('tab-report').className = tab === 'report' ? 'py-3 px-2 tab-active' : 'py-3 px-2 hover:text-slate-200';
+      if (tab === 'editor') resizeCanvas();
+    }
+
     function resizeCanvas() {
       canvas.width = canvas.clientWidth;
       canvas.height = canvas.clientHeight;
     }
     window.addEventListener('resize', resizeCanvas);
-    setTimeout(resizeCanvas, 500);
 
-    // Cargar vídeo local
+    // Cargar vídeo
     function loadVideo(event) {
       const file = event.target.files[0];
       if (file) {
-        const url = URL.createObjectURL(file);
-        video.src = url;
+        video.src = URL.createObjectURL(file);
         video.play();
         document.getElementById('playBtn').innerText = '❚❚ Pausa';
+        setTimeout(resizeCanvas, 300);
       }
     }
 
-    // Play / Pausa
     function togglePlay() {
-      if (video.paused) {
-        video.play();
-        document.getElementById('playBtn').innerText = '❚❚ Pausa';
-      } else {
-        video.pause();
-        document.getElementById('playBtn').innerText = '▶ Play';
-      }
+      if (video.paused) { video.play(); document.getElementById('playBtn').innerText = '❚❚ Pausa'; } 
+      else { video.pause(); document.getElementById('playBtn').innerText = '▶ Play'; }
     }
 
-    // Sincronizar barra de progreso
     function updateProgress() {
-      const seekBar = document.getElementById('seekBar');
-      const timeDisplay = document.getElementById('currentTime');
-      const durDisplay = document.getElementById('durationTime');
-      
       if (!isNaN(video.duration)) {
-        seekBar.value = (video.currentTime / video.duration) * 100;
-        timeDisplay.innerText = formatTime(video.currentTime);
-        durDisplay.innerText = formatTime(video.duration);
+        document.getElementById('seekBar').value = (video.currentTime / video.duration) * 100;
+        document.getElementById('currentTime').innerText = formatTime(video.currentTime);
+        document.getElementById('durationTime').innerText = formatTime(video.duration);
       }
     }
 
     function seekVideo() {
-      const seekBar = document.getElementById('seekBar');
-      video.currentTime = (seekBar.value / 100) * video.duration;
+      video.currentTime = (document.getElementById('seekBar').value / 100) * video.duration;
     }
 
-    function formatTime(seconds) {
-      const mins = Math.floor(seconds / 60);
-      const secs = Math.floor(seconds % 60);
-      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    function formatTime(s) {
+      const m = Math.floor(s / 60); const secs = Math.floor(s % 60);
+      return `${m.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
-    // Fijar Puntos IN / OUT
     function setPoint(type) {
       if (type === 'in') pointIn = video.currentTime;
       if (type === 'out') pointOut = video.currentTime;
-      alert(`Punto ${type.toUpperCase()} fijado en: ${formatTime(video.currentTime)}`);
+      alert(`Punto ${type.toUpperCase()} fijado: ${formatTime(video.currentTime)}`);
     }
 
-    // Guardar Corte en la Galería
     function saveClip() {
       if (pointIn === null || pointOut === null || pointIn >= pointOut) {
-        alert('Selecciona puntos IN y OUT válidos antes de guardar.');
-        return;
+        alert('Selecciona un punto IN y OUT válido.'); return;
       }
-      const clipName = prompt('Nombre de la acción táctica:', `Corte ${clips.length + 1}`);
-      if (clipName) {
-        clips.push({ name: clipName, in: pointIn, out: pointOut });
+      const name = prompt('Nombre del corte:', `Corte ${clips.length + 1}`);
+      if (name) {
+        clips.push({ id: Date.now(), name, in: pointIn, out: pointOut });
         renderClips();
-        pointIn = null;
-        pointOut = null;
+        pointIn = null; pointOut = null;
       }
     }
 
     function renderClips() {
       const list = document.getElementById('clipsList');
       list.innerHTML = '';
-      clips.forEach((clip, index) => {
+      clips.forEach(clip => {
         list.innerHTML += `
-          <div class="bg-slate-700/50 p-3 rounded-lg border border-slate-600 flex justify-between items-center">
+          <div class="bg-slate-700/50 p-2.5 rounded-lg border border-slate-600 flex justify-between items-center">
             <div>
-              <p class="font-semibold text-sm text-blue-400">${clip.name}</p>
-              <p class="text-xs text-slate-400 font-mono">${formatTime(clip.in)} ➔ ${formatTime(clip.out)}</p>
+              <p class="font-semibold text-xs text-blue-400">${clip.name}</p>
+              <p class="text-[10px] text-slate-400 font-mono">${formatTime(clip.in)} ➔ ${formatTime(clip.out)}</p>
             </div>
-            <button onclick="playClip(${clip.in})" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-2 py-1 rounded">▶ Ver</button>
-          </div>
-        `;
+            <button onclick="playClip(${clip.in})" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] px-2 py-1 rounded">▶ Ver</button>
+          </div>`;
       });
     }
 
-    function playClip(inTime) {
-      video.currentTime = inTime;
-      video.play();
+    function playClip(inTime) { video.currentTime = inTime; video.play(); }
+
+    // Herramientas de Dibujo
+    function setTool(tool) {
+      currentTool = tool;
+      document.getElementById('toolArrow').className = tool === 'arrow' ? 'bg-blue-600 p-2 rounded text-xs font-medium flex items-center justify-center gap-1' : 'bg-slate-700 hover:bg-slate-600 p-2 rounded text-xs font-medium flex items-center justify-center gap-1';
+      document.getElementById('toolSpot').className = tool === 'spotlight' ? 'bg-blue-600 p-2 rounded text-xs font-medium flex items-center justify-center gap-1' : 'bg-slate-700 hover:bg-slate-600 p-2 rounded text-xs font-medium flex items-center justify-center gap-1';
     }
 
-    // Dibujo Táctico Canvas Básico (Líneas y Focos)
+    function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
     canvas.addEventListener('mousedown', (e) => {
       const rect = canvas.getBoundingClientRect();
-      startX = e.clientX - rect.left;
-      startY = e.clientY - rect.top;
+      startX = e.clientX - rect.left; startY = e.clientY - rect.top;
       isDrawing = true;
     });
 
     canvas.addEventListener('mouseup', (e) => {
       if (!isDrawing) return;
       const rect = canvas.getBoundingClientRect();
-      const endX = e.clientX - rect.left;
-      const endY = e.clientY - rect.top;
+      const endX = e.clientX - rect.left; const endY = e.clientY - rect.top;
       isDrawing = false;
 
-      ctx.strokeStyle = '#3b82f6';
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.moveTo(startX, startY);
-      ctx.lineTo(endX, endY);
-      ctx.stroke();
+      if (currentTool === 'arrow') {
+        ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(endX, endY); ctx.stroke();
+      } else if (currentTool === 'spotlight') {
+        const radius = Math.hypot(endX - startX, endY - startY);
+        ctx.fillStyle = 'rgba(253, 224, 71, 0.3)';
+        ctx.strokeStyle = '#fde047'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(startX, startY, radius || 30, 0, 2 * Math.PI);
+        ctx.fill(); ctx.stroke();
+      }
     });
+
+    // Creador de Informes por Bloques
+    function addReportBlock() {
+      const container = document.getElementById('reportBlocksContainer');
+      if (reportBlocks.length === 0) container.innerHTML = '';
+      
+      const blockId = Date.now();
+      reportBlocks.push(blockId);
+
+      let optionsHTML = clips.map(c => `<option value="${c.id}">${c.name} (${formatTime(c.in)} - ${formatTime(c.out)})</option>`).join('');
+
+      container.innerHTML += `
+        <div id="block-${blockId}" class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4">
+          <div class="flex justify-between items-center">
+            <input type="text" placeholder="Título de la Fase (Ej: 1. Salida de Balón)" class="bg-slate-900 border border-slate-700 text-white text-sm font-bold rounded-lg px-3 py-2 w-2/3 focus:outline-none focus:border-blue-500">
+            <button onclick="removeBlock(${blockId})" class="text-red-400 hover:text-red-300 text-xs">🗑️ Eliminar Bloque</button>
+          </div>
+          <textarea placeholder="Comentarios tácticos del analista..." class="w-full bg-slate-900 border border-slate-700 text-white text-xs rounded-lg p-3 h-20 focus:outline-none focus:border-blue-500"></textarea>
+          <div class="flex items-center gap-3 bg-slate-900/50 p-3 rounded-lg border border-slate-700/50">
+            <span class="text-xs text-slate-400">Asignar Corte de Vídeo:</span>
+            <select class="bg-slate-800 border border-slate-700 text-white text-xs rounded px-2 py-1 flex-1 focus:outline-none">
+              <option value="">-- Seleccionar corte de la librería --</option>
+              ${optionsHTML}
+            </select>
+          </div>
+        </div>`;
+    }
+
+    function removeBlock(id) {
+      document.getElementById(`block-${id}`).remove();
+      reportBlocks = reportBlocks.filter(b => b !== id);
+    }
   </script>
 </body>
 </html>
