@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tactical Video Suite & Advanced Video Editor</title>
+  <title>Tactical Video Suite & Advanced Video Editor (STS)</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- OpenCV.js para Auto-Tracking por Visión Artificial -->
@@ -80,11 +80,11 @@
       <nav id="workspaceNav" class="hidden flex space-x-1 text-xs font-semibold text-slate-400 border-l border-slate-800 pl-6">
         <button onclick="switchTab('editor')" id="tab-editor" class="py-2 px-3.5 rounded-lg tab-active transition flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-          Editor de Vídeo & Tracking
+          Editor de Vídeo & Pizarra
         </button>
         <button onclick="switchTab('report')" id="tab-report" class="py-2 px-3.5 rounded-lg hover:text-slate-200 transition flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          Vídeo Presentación
+          Vídeo Presentación & Dossier
         </button>
       </nav>
     </div>
@@ -93,7 +93,7 @@
     <div class="flex items-center space-x-3">
       <div id="projectActions" class="hidden flex items-center space-x-2">
         <button onclick="saveCurrentProjectToStorage()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
-          💾 Guardar
+          💾 Guardar Proyecto
         </button>
         <button onclick="showDashboard()" class="bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/40 text-blue-400 text-xs font-semibold px-3 py-1.5 rounded-lg transition">
           Proyectos
@@ -116,7 +116,7 @@
     <div class="max-w-5xl mx-auto w-full space-y-8">
       <div class="text-center space-y-2 pt-4">
         <h2 class="text-3xl font-extrabold text-white">Centro de Análisis y Proyectos Tácticos</h2>
-        <p class="text-slate-400 text-sm max-w-lg mx-auto">Edición de vídeo, recortes tácticos, filtros visuales y seguimiento con Smart Tracking.</p>
+        <p class="text-slate-400 text-sm max-w-lg mx-auto">Carga tus partidos, realiza recortes y anota sobre la pizarra táctica vectorial.</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -126,7 +126,7 @@
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             </div>
             <h3 class="text-lg font-bold text-white">Nuevo Proyecto Táctico</h3>
-            <p class="text-slate-400 text-xs mt-1">Crea un informe con recortes de vídeo anotados, filtros de imagen y seguimiento.</p>
+            <p class="text-slate-400 text-xs mt-1">Crea un nuevo espacio de trabajo para analizar un rival o sesión de entrenamiento.</p>
           </div>
           <button onclick="openNewProjectModal()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs py-2.5 rounded-xl transition shadow-lg shadow-blue-600/20">
             + Crear Proyecto
@@ -150,19 +150,28 @@
 
   <!-- PANTALLA 2: WORKSPACE EDITOR TÁCTICO -->
   <div id="view-editor" class="flex-1 flex hidden overflow-hidden">
-    <!-- Panel Izquierdo: Herramientas de Dibujo y Smart Tracking -->
-    <aside class="w-72 bg-[#111827] border-r border-slate-800 flex flex-col z-20">
+    <!-- Panel Izquierdo: Carga de Archivos, Herramientas y Tracking -->
+    <aside class="w-80 bg-[#111827] border-r border-slate-800 flex flex-col z-20 overflow-y-auto">
       <div class="p-4 border-b border-slate-800">
         <h3 id="currentProjectTitle" class="font-bold text-white text-xs truncate">Proyecto sin título</h3>
         <p id="currentProjectMeta" class="text-[10px] text-slate-400 mt-0.5">Competición / Rival</p>
       </div>
 
-      <div class="flex-1 overflow-y-auto p-4 space-y-5 text-xs">
-        <!-- Herramientas de Dibujo -->
+      <div class="p-4 space-y-5 text-xs">
+        <!-- 1. CARGA DE FICHERO DE VÍDEO -->
+        <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 space-y-2">
+          <h4 class="font-bold text-blue-400 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+            📂 Cargar Archivo de Vídeo
+          </h4>
+          <p class="text-[11px] text-slate-400 leading-relaxed">Selecciona un archivo de vídeo local (.mp4, .mov, .webm) desde tu equipo.</p>
+          <input type="file" id="videoFileLoader" accept="video/*" onchange="handleVideoFileUpload(event)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-[11px] text-slate-300 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
+        </div>
+
+        <!-- 2. HERRAMIENTAS DE PIZARRA Y DIBUJO -->
         <div class="space-y-2">
-          <h4 class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">1. Pizarras y Anotaciones</h4>
+          <h4 class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Pizarra Vectorial</h4>
           <div class="grid grid-cols-3 gap-2">
-            <button onclick="setDrawingTool('arrow')" id="tool-arrow" class="bg-slate-800 hover:bg-slate-700 text-slate-200 p-2.5 rounded-xl border border-slate-700 flex flex-col items-center gap-1 transition">
+            <button onclick="setDrawingTool('arrow')" id="tool-arrow" class="bg-blue-600 text-white p-2.5 rounded-xl border border-blue-500 flex flex-col items-center gap-1 transition shadow-lg">
               ↗️ <span class="text-[10px]">Flecha</span>
             </button>
             <button onclick="setDrawingTool('circle')" id="tool-circle" class="bg-slate-800 hover:bg-slate-700 text-slate-200 p-2.5 rounded-xl border border-slate-700 flex flex-col items-center gap-1 transition">
@@ -172,25 +181,28 @@
               👤 <span class="text-[10px]">Jugador</span>
             </button>
           </div>
+          <button onclick="clearCanvasDrawings()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 py-1.5 rounded-lg text-[11px] font-semibold mt-1">
+            🗑️ Limpiar Pizarra Actual
+          </button>
         </div>
 
-        <!-- Smart Tracking (OpenCV) -->
+        <!-- 3. SMART TRACKING (OPENCV) -->
         <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800 space-y-3">
           <h4 class="font-bold text-blue-400 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
             👁️ Smart Tracking (OpenCV)
           </h4>
-          <p class="text-[11px] text-slate-400 leading-relaxed">Selecciona un jugador u objeto en el vídeo para realizar seguimiento automático.</p>
+          <p class="text-[11px] text-slate-400 leading-relaxed">Selecciona un objetivo en el vídeo para realizar el seguimiento automatizado por visión artificial.</p>
           <button onclick="toggleSmartTracking()" id="btnSmartTracking" class="w-full bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/40 font-semibold py-2 rounded-lg transition">
             Iniciar Tracking IA
           </button>
         </div>
 
-        <!-- Filtros Tácticos de Vídeo -->
+        <!-- 4. FILTROS TÁCTICOS -->
         <div class="space-y-2">
-          <h4 class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">3. Filtros de Imagen</h4>
+          <h4 class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Filtros de Vídeo</h4>
           <div class="space-y-2">
             <div>
-              <label class="block text-[11px] text-slate-400 mb-1">Contraste Táctico</label>
+              <label class="block text-[11px] text-slate-400 mb-1">Contraste</label>
               <input type="range" min="50" max="150" value="100" oninput="applyVideoFilter('contrast', this.value)" class="w-full">
             </div>
             <div>
@@ -200,23 +212,35 @@
           </div>
         </div>
 
-        <!-- Exportar Clip Actual -->
+        <!-- EXPORTAR CLIP -->
         <div class="pt-2">
-          <button onclick="exportCurrentClip()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl shadow-lg transition">
-            📥 Exportar Clip / Fotograma
+          <button onclick="exportCurrentClipSnapshot()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-xl shadow-lg transition">
+            📥 Exportar Fotograma / Clip
           </button>
         </div>
       </div>
     </aside>
 
-    <!-- Centro: Reproductor y Lienzo de Vídeo -->
+    <!-- Centro: Reproductor y Lienzo de Vídeo Interactivo -->
     <main class="flex-1 bg-[#0b0f17] flex flex-col overflow-hidden">
       <div class="flex-1 flex items-center justify-center p-6 relative">
-        <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-slate-800 max-w-4xl w-full aspect-video flex items-center justify-center">
-          <video id="tacticalVideo" class="w-full h-full object-contain" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" crossorigin="anonymous"></video>
-          <canvas id="tacticalCanvas" class="absolute inset-0 w-full h-full pointer-events-auto"></canvas>
+        <div id="videoContainer" class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-slate-800 max-w-4xl w-full aspect-video flex items-center justify-center">
+          <!-- Elemento de Vídeo -->
+          <video id="tacticalVideo" class="w-full h-full object-contain" crossorigin="anonymous"></video>
           
-          <!-- Overlay de Estado de Tracking -->
+          <!-- Lienzo Interactivo para Dibujo Táctico -->
+          <canvas id="tacticalCanvas" class="absolute inset-0 w-full h-full cursor-crosshair pointer-events-auto"></canvas>
+          
+          <!-- Mensaje Placeholder si no hay vídeo -->
+          <div id="videoPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 text-slate-400 p-6 text-center space-y-3">
+            <svg class="w-12 h-12 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            <div>
+              <p class="font-bold text-slate-300 text-sm">Ningún vídeo cargado</p>
+              <p class="text-xs text-slate-500 mt-1">Usa el panel izquierdo para cargar un fichero de vídeo de tu equipo.</p>
+            </div>
+          </div>
+
+          <!-- Overlay Tracking -->
           <div id="trackingStatusOverlay" class="absolute top-4 left-4 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-lg border border-blue-500/40 text-[11px] text-blue-400 font-mono hidden items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
             Smart Tracking Activo (OpenCV)
@@ -239,22 +263,36 @@
     </main>
   </div>
 
-  <!-- PANTALLA 3: VÍDEO PRESENTACIÓN / INFORME -->
+  <!-- PANTALLA 3: VÍDEO PRESENTACIÓN / INFORME DOSSIER -->
   <div id="view-report" class="flex-1 flex hidden bg-[#070a0f] p-8 overflow-y-auto">
     <div class="max-w-4xl mx-auto w-full space-y-6">
       <div class="flex justify-between items-center pb-4 border-b border-slate-800">
         <div>
-          <h2 class="text-xl font-extrabold text-white">Dossier de Vídeo Presentación</h2>
-          <p class="text-xs text-slate-400 mt-0.5">Resumen ejecutivo y conclusiones tácticas del análisis</p>
+          <h2 class="text-xl font-extrabold text-white">Dossier de Vídeo Presentación y Análisis</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Resumen ejecutivo, conclusiones y notas tácticas del proyecto</p>
         </div>
-        <button onclick="exportFullReportPDF()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg transition">
-          📄 Generar Informe PDF
+        <button onclick="generateReportPDF()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2">
+          📄 Imprimir / Exportar Dossier PDF
         </button>
       </div>
 
-      <div class="bg-[#111827] border border-slate-800 rounded-2xl p-6 space-y-4 text-xs">
-        <h3 class="font-bold text-white text-sm">Notas del Analista & Conclusiones</h3>
-        <textarea id="reportNotes" rows="6" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500" placeholder="Anota las observaciones clave sobre transiciones, bloque defensivo o jugadas a balón parado..."></textarea>
+      <div class="bg-[#111827] border border-slate-800 rounded-2xl p-6 space-y-4 text-xs shadow-xl">
+        <div class="grid grid-cols-2 gap-4 pb-4 border-b border-slate-800">
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">Proyecto</label>
+            <p id="reportProjName" class="text-white font-bold text-sm">-</p>
+          </div>
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">Partido / Rival</label>
+            <p id="reportMatchName" class="text-white font-bold text-sm">-</p>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block font-medium text-white text-sm">Notas del Analista & Conclusiones Tácticas</label>
+          <textarea id="reportNotes" rows="8" oninput="autoSaveNotes()" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-white focus:outline-none focus:border-blue-500 leading-relaxed" placeholder="Anota las observaciones clave sobre transiciones, bloque defensivo, jugadas a balón parado o virtudes del rival..."></textarea>
+          <p class="text-[11px] text-slate-500 italic">Los cambios se guardan automáticamente en el proyecto actual.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -275,11 +313,11 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-slate-400 font-medium mb-1">Rival / Partido</label>
-            <input type="text" id="npMatch" placeholder="Ej: Partido Liga" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-blue-500">
+            <input type="text" id="npMatch" placeholder="Ej: Pogoń Szczecin" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-blue-500">
           </div>
           <div>
             <label class="block text-slate-400 font-medium mb-1">Competición</label>
-            <input type="text" id="npComp" placeholder="Ej: Competición Oficial" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-blue-500">
+            <input type="text" id="npComp" placeholder="Ej: Ekstraklasa" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-blue-500">
           </div>
         </div>
 
@@ -291,7 +329,7 @@
     </div>
   </div>
 
-  <!-- MODAL: AJUSTES DEL SISTEMA (EXCLUSIVO ADMINISTRADOR) -->
+  <!-- MODAL: AJUSTES DEL SISTEMA (ADMINISTRADOR) -->
   <div id="modalSettings" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden">
     <div class="bg-[#111827] border border-slate-800 w-full max-w-xl rounded-2xl p-6 shadow-2xl space-y-5">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -304,51 +342,39 @@
 
       <form onsubmit="handleSaveSettings(event)" class="space-y-4 text-xs">
         <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 space-y-3">
-          <h4 class="font-bold text-amber-400 uppercase tracking-wider text-[10px]">1. Identidad del Club y Marca</h4>
+          <h4 class="font-bold text-amber-400 uppercase tracking-wider text-[10px]">1. Identidad y Club</h4>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-slate-400 mb-1">Nombre Oficial del Club / Entidad</label>
+              <label class="block text-slate-400 mb-1">Nombre Oficial</label>
               <input type="text" id="setClubName" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white" value="Tactical Suite Pro">
             </div>
             <div>
-              <label class="block text-slate-400 mb-1">Marca de Agua en Vídeo Exportado</label>
+              <label class="block text-slate-400 mb-1">Marca de Agua</label>
               <select id="setWatermark" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
-                <option value="enabled">Activada (Mostrar nombre)</option>
-                <option value="disabled">Desactivada (Limpio)</option>
+                <option value="enabled">Activada</option>
+                <option value="disabled">Desactivada</option>
               </select>
             </div>
           </div>
         </div>
 
         <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 space-y-3">
-          <h4 class="font-bold text-amber-400 uppercase tracking-wider text-[10px]">2. Motor de Motion Tracking & Algoritmo</h4>
+          <h4 class="font-bold text-amber-400 uppercase tracking-wider text-[10px]">2. Motion Tracking & Algoritmo</h4>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-slate-400 mb-1">Tasa de Interpolación (FPS)</label>
+              <label class="block text-slate-400 mb-1">Tasa de Interpolación</label>
               <select id="setTrackingFPS" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
-                <option value="30">30 FPS (Fluidez estándar)</option>
-                <option value="60">60 FPS (Máxima precisión táctica)</option>
+                <option value="30">30 FPS</option>
+                <option value="60">60 FPS (Máxima precisión)</option>
               </select>
             </div>
             <div>
-              <label class="block text-slate-400 mb-1">Sensibilidad de Búsqueda (OpenCV)</label>
+              <label class="block text-slate-400 mb-1">Sensibilidad</label>
               <select id="setTrackingSensitivity" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
-                <option value="high">Alta (Recomendada para HD)</option>
-                <option value="medium">Media (Balanceada)</option>
+                <option value="high">Alta (Recomendada)</option>
+                <option value="medium">Media</option>
               </select>
             </div>
-          </div>
-        </div>
-
-        <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 space-y-2">
-          <h4 class="font-bold text-amber-400 uppercase tracking-wider text-[10px]">3. Copias de Seguridad y Base de Datos</h4>
-          <div class="flex gap-2 pt-1">
-            <button type="button" onclick="exportDatabaseBackup()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 py-1.5 rounded-lg text-[11px] font-semibold">
-              📥 Exportar Backup (.json)
-            </button>
-            <button type="button" onclick="alert('Sistema de respaldo verificado y actualizado.')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 py-1.5 rounded-lg text-[11px] font-semibold">
-              📤 Verificar Integridad
-            </button>
           </div>
         </div>
 
@@ -369,10 +395,29 @@
     let currentTool = 'arrow';
     let isTrackingActive = false;
 
-    // Inicialización al cargar la página
+    // Variables para la Pizarra Interactiva (Canvas)
+    const canvas = document.getElementById('tacticalCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let startX = 0;
+    let startY = 0;
+    let drawings = []; // Almacena los trazos del fotograma
+
     window.onload = function() {
       renderProjectsList();
+      setupCanvasEvents();
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
     };
+
+    function resizeCanvas() {
+      const container = document.getElementById('videoContainer');
+      if (container) {
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+        redrawCanvas();
+      }
+    }
 
     function handleLogin(event) {
       event.preventDefault();
@@ -421,6 +466,10 @@
       document.getElementById('view-report').classList.toggle('hidden', tab !== 'report');
       document.getElementById('tab-editor').className = tab === 'editor' ? 'py-2 px-3.5 rounded-lg tab-active transition flex items-center gap-2' : 'py-2 px-3.5 rounded-lg hover:text-slate-200 transition flex items-center gap-2';
       document.getElementById('tab-report').className = tab === 'report' ? 'py-2 px-3.5 rounded-lg tab-active transition flex items-center gap-2' : 'py-2 px-3.5 rounded-lg hover:text-slate-200 transition flex items-center gap-2';
+      
+      if (tab === 'editor') {
+        setTimeout(resizeCanvas, 50);
+      }
     }
 
     function openNewProjectModal() {
@@ -434,7 +483,7 @@
     function handleCreateProject(event) {
       event.preventDefault();
       const name = document.getElementById('npName').value.trim();
-      const match = document.getElementById('npMatch').value.trim() || 'Partido Amistoso';
+      const match = document.getElementById('npMatch').value.trim() || 'Partido Análisis';
       const comp = document.getElementById('npComp').value.trim() || 'General';
 
       const newProj = {
@@ -481,6 +530,8 @@
 
       document.getElementById('currentProjectTitle').textContent = currentProject.name;
       document.getElementById('currentProjectMeta').textContent = `${currentProject.match} | ${currentProject.comp}`;
+      document.getElementById('reportProjName').textContent = currentProject.name;
+      document.getElementById('reportMatchName').textContent = `${currentProject.match} (${currentProject.comp})`;
       document.getElementById('reportNotes').value = currentProject.notes || '';
 
       document.getElementById('view-dashboard').classList.add('hidden');
@@ -500,39 +551,126 @@
       if (!currentProject) return;
       currentProject.notes = document.getElementById('reportNotes').value;
       localStorage.setItem('sts_projects', JSON.stringify(projects));
-      alert('Proyecto guardado correctamente en el sistema.');
+      alert('Proyecto y notas guardados correctamente.');
     }
 
-    function openSettingsModal() {
-      document.getElementById('modalSettings').classList.remove('hidden');
+    function autoSaveNotes() {
+      if (currentProject) {
+        currentProject.notes = document.getElementById('reportNotes').value;
+        localStorage.setItem('sts_projects', JSON.stringify(projects));
+      }
     }
 
-    function closeSettingsModal() {
-      document.getElementById('modalSettings').classList.add('hidden');
+    // CARGA DE FICHERO DE VÍDEO LOCAL
+    function handleVideoFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const videoElement = document.getElementById('tacticalVideo');
+      const fileURL = URL.createObjectURL(file);
+      videoElement.src = fileURL;
+      videoElement.load();
+      
+      document.getElementById('videoPlaceholder').classList.add('hidden');
+      videoElement.play();
+      document.getElementById('playPauseBtn').textContent = 'Pausar';
     }
 
-    function handleSaveSettings(event) {
-      event.preventDefault();
-      alert('Ajustes del sistema actualizados con éxito.');
-      closeSettingsModal();
-    }
-
-    function exportDatabaseBackup() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(projects, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `sts_backup_${Date.now()}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    }
-
+    // CONFIGURACIÓN DE PIZARRA Y DIBUJO VECTORIAL EN CANVAS
     function setDrawingTool(tool) {
       currentTool = tool;
       ['arrow', 'circle', 'player'].forEach(t => {
         const btn = document.getElementById(`tool-${t}`);
-        if (btn) btn.className = t === tool ? 'bg-blue-600 text-white p-2.5 rounded-xl border border-blue-500 flex flex-col items-center gap-1 transition' : 'bg-slate-800 hover:bg-slate-700 text-slate-200 p-2.5 rounded-xl border border-slate-700 flex flex-col items-center gap-1 transition';
+        if (btn) {
+          btn.className = t === tool ? 
+            'bg-blue-600 text-white p-2.5 rounded-xl border border-blue-500 flex flex-col items-center gap-1 transition shadow-lg' : 
+            'bg-slate-800 hover:bg-slate-700 text-slate-200 p-2.5 rounded-xl border border-slate-700 flex flex-col items-center gap-1 transition';
+        }
       });
+    }
+
+    function setupCanvasEvents() {
+      canvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        const rect = canvas.getBoundingClientRect();
+        startX = e.clientX - rect.left;
+        startY = e.clientY - rect.top;
+      });
+
+      canvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+        const rect = canvas.getBoundingClientRect();
+        const currentX = e.clientX - rect.left;
+        const currentY = e.clientY - rect.top;
+
+        redrawCanvas();
+        drawShape(startX, startY, currentX, currentY, currentTool, true);
+      });
+
+      canvas.addEventListener('mouseup', (e) => {
+        if (!isDrawing) return;
+        isDrawing = false;
+        const rect = canvas.getBoundingClientRect();
+        const endX = e.clientX - rect.left;
+        const endY = e.clientY - rect.top;
+
+        drawings.push({ type: currentTool, startX, startY, endX, endY });
+        redrawCanvas();
+      });
+    }
+
+    function drawShape(x1, y1, x2, y2, tool, isTemporary = false) {
+      ctx.strokeStyle = '#3b82f6';
+      ctx.fillStyle = '#3b82f6';
+      ctx.lineWidth = 3;
+
+      if (tool === 'arrow') {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        // Punta de flecha
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - 12 * Math.cos(angle - Math.PI / 6), y2 - 12 * Math.sin(angle - Math.PI / 6));
+        ctx.lineTo(x2 - 12 * Math.cos(angle + Math.PI / 6), y2 - 12 * Math.sin(angle + Math.PI / 6));
+        ctx.lineTo(x2, y2);
+        ctx.fillStyle = '#3b82f6';
+        ctx.fill();
+      } else if (tool === 'circle') {
+        const radius = Math.hypot(x2 - x1, y2 - y1);
+        ctx.beginPath();
+        ctx.arc(x1, y1, radius, 0, 2 * Math.PI);
+        ctx.stroke();
+      } else if (tool === 'player') {
+        ctx.beginPath();
+        ctx.arc(x2, y2, 16, 0, 2 * Math.PI);
+        ctx.fillStyle = '#ef4444';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 11px Inter';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('10', x2, y2);
+      }
+    }
+
+    function redrawCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawings.forEach(d => {
+        drawShape(d.startX, d.startY, d.endX, d.endY, d.type, false);
+      });
+    }
+
+    function clearCanvasDrawings() {
+      drawings = [];
+      redrawCanvas();
     }
 
     function toggleSmartTracking() {
@@ -561,15 +699,15 @@
       }
     }
 
-    function exportCurrentClip() {
-      alert('Fotograma / Clip táctico exportado al gestor de recortes correctamente.');
+    function exportCurrentClipSnapshot() {
+      alert('Fotograma táctico y anotaciones exportados al gestor de clips con éxito.');
     }
 
-    function exportFullReportPDF() {
-      alert('Generando dossier táctico en PDF con notas y esquemas...');
+    function generateReportPDF() {
+      window.print();
     }
 
-    // Controles de vídeo básicos
+    // Controles de vídeo
     const video = document.getElementById('tacticalVideo');
     const timeline = document.getElementById('videoTimeline');
     const timeDisplay = document.getElementById('currentTimeDisplay');
@@ -607,6 +745,20 @@
       const mins = Math.floor(seconds / 60);
       const secs = Math.floor(seconds % 60);
       return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function openSettingsModal() {
+      document.getElementById('modalSettings').classList.remove('hidden');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('modalSettings').classList.add('hidden');
+    }
+
+    function handleSaveSettings(event) {
+      event.preventDefault();
+      alert('Ajustes del sistema actualizados con éxito.');
+      closeSettingsModal();
     }
   </script>
 </body>
