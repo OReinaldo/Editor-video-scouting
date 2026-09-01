@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suite de Scouting & Análisis Táctico - MVP v1</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    canvas { pointer-events: auto; }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased h-screen flex flex-col">
+
+  <!-- BARRA SUPERIOR / HEADER -->
+  <header class="bg-slate-800 border-b border-slate-700 px-6 py-3 flex items-center justify-between shrink-0">
+    <div class="flex items-center space-x-3">
+      <div class="bg-blue-600 text-white p-2 rounded-lg font-bold">ST</div>
+      <div>
+        <h1 class="font-bold text-lg leading-tight">Scouting Tactical Suite</h1>
+        <p class="text-xs text-slate-400">Entorno de Análisis Local-First • Beta v1.0</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-3">
+      <input type="file" id="videoInput" accept="video/mp4,video/mkv" class="hidden" onchange="loadVideo(event)">
+      <button onclick="document.getElementById('videoInput').click()" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition flex items-center gap-2">
+        📂 Cargar Vídeo del Partido
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="flex-1 flex overflow-hidden">
+    
+    <!-- ÁREA DEL REPRODUCTOR Y LIENZO TÁCTICO -->
+    <main class="flex-1 flex flex-col bg-black relative justify-center items-center overflow-hidden">
+      
+      <!-- CONTENEDOR DE VÍDEO + CANVAS OVERLAY -->
+      <div id="mediaContainer" class="relative max-w-full max-h-full aspect-video flex items-center justify-center bg-slate-950">
+        <video id="videoPlayer" class="w-full h-full object-contain" ontimeupdate="updateProgress()"></video>
+        <canvas id="tacticalCanvas" class="absolute top-0 left-0 w-full h-full cursor-crosshair"></canvas>
+      </div>
+
+      <!-- PANEL DE CONTROL FLOTANTE DEL VÍDEO -->
+      <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-slate-800/90 backdrop-blur border border-slate-700 p-3 rounded-xl shadow-2xl flex items-center gap-4 w-11/12 max-w-3xl">
+        
+        <button onclick="togglePlay()" id="playBtn" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-bold text-sm">▶ Play</button>
+        
+        <div class="flex-1 flex flex-col gap-1">
+          <input type="range" id="seekBar" value="0" min="0" max="100" step="0.1" oninput="seekVideo()" class="w-full accent-blue-500 cursor-pointer h-2 bg-slate-700 rounded-lg">
+          <div class="flex justify-between text-xs text-slate-400 font-mono">
+            <span id="currentTime">00:00</span>
+            <span id="durationTime">00:00</span>
+          </div>
+        </div>
+
+        <!-- CONTROLES DE MARCADOR IN/OUT -->
+        <div class="flex items-center gap-2 border-l border-slate-700 pl-4">
+          <button onclick="setPoint('in')" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded text-xs font-semibold">Punto IN [I]</button>
+          <button onclick="setPoint('out')" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded text-xs font-semibold">Punto OUT [O]</button>
+          <button onclick="saveClip()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded text-xs font-bold">💾 Guardar Corte</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- PANEL LATERAL: HERRAMIENTAS Y BIBLIOTECA DE CORTES -->
+    <aside class="w-80 bg-slate-800 border-l border-slate-700 flex flex-col shrink-0">
+      
+      <!-- HERRAMIENTAS DE DIBUJO TÁCTICO -->
+      <div class="p-4 border-b border-slate-700">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Herramientas Tácticas</h2>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="setTool('arrow')" id="toolArrow" class="bg-slate-700 hover:bg-slate-600 p-2 rounded text-xs font-medium flex items-center gap-2">
+            ↗️ Flecha Carrera
+          </button>
+          <button onclick="setTool('spotlight')" id="toolSpot" class="bg-slate-700 hover:bg-slate-600 p-2 rounded text-xs font-medium flex items-center gap-2">
+            💡 Foco Jugador
+          </button>
+        </div>
+      </div>
+
+      <!-- BIBLIOTECA DE CORTES -->
+      <div class="flex-1 p-4 overflow-y-auto">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Cortes del Proyecto</h2>
+        <div id="clipsList" class="space-y-2">
+          <p class="text-xs text-slate-500 italic">No hay cortes creados todavía. Selecciona un punto IN y OUT y pulsa "Guardar Corte".</p>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- SCRIPT DE LÓGICA DE FUNCIONAMIENTO -->
+  <script>
+    const video = document.getElementById('videoPlayer');
+    const canvas = document.getElementById('tacticalCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let pointIn = null;
+    let pointOut = null;
+    let currentTool = 'arrow';
+    let isDrawing = false;
+    let startX, startY;
+    let clips = [];
+
+    // Ajustar resolución del Canvas
+    function resizeCanvas() {
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    setTimeout(resizeCanvas, 500);
+
+    // Cargar vídeo local
+    function loadVideo(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        video.src = url;
+        video.play();
+        document.getElementById('playBtn').innerText = '❚❚ Pausa';
+      }
+    }
+
+    // Play / Pausa
+    function togglePlay() {
+      if (video.paused) {
+        video.play();
+        document.getElementById('playBtn').innerText = '❚❚ Pausa';
+      } else {
+        video.pause();
+        document.getElementById('playBtn').innerText = '▶ Play';
+      }
+    }
+
+    // Sincronizar barra de progreso
+    function updateProgress() {
+      const seekBar = document.getElementById('seekBar');
+      const timeDisplay = document.getElementById('currentTime');
+      const durDisplay = document.getElementById('durationTime');
+      
+      if (!isNaN(video.duration)) {
+        seekBar.value = (video.currentTime / video.duration) * 100;
+        timeDisplay.innerText = formatTime(video.currentTime);
+        durDisplay.innerText = formatTime(video.duration);
+      }
+    }
+
+    function seekVideo() {
+      const seekBar = document.getElementById('seekBar');
+      video.currentTime = (seekBar.value / 100) * video.duration;
+    }
+
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // Fijar Puntos IN / OUT
+    function setPoint(type) {
+      if (type === 'in') pointIn = video.currentTime;
+      if (type === 'out') pointOut = video.currentTime;
+      alert(`Punto ${type.toUpperCase()} fijado en: ${formatTime(video.currentTime)}`);
+    }
+
+    // Guardar Corte en la Galería
+    function saveClip() {
+      if (pointIn === null || pointOut === null || pointIn >= pointOut) {
+        alert('Selecciona puntos IN y OUT válidos antes de guardar.');
+        return;
+      }
+      const clipName = prompt('Nombre de la acción táctica:', `Corte ${clips.length + 1}`);
+      if (clipName) {
+        clips.push({ name: clipName, in: pointIn, out: pointOut });
+        renderClips();
+        pointIn = null;
+        pointOut = null;
+      }
+    }
+
+    function renderClips() {
+      const list = document.getElementById('clipsList');
+      list.innerHTML = '';
+      clips.forEach((clip, index) => {
+        list.innerHTML += `
+          <div class="bg-slate-700/50 p-3 rounded-lg border border-slate-600 flex justify-between items-center">
+            <div>
+              <p class="font-semibold text-sm text-blue-400">${clip.name}</p>
+              <p class="text-xs text-slate-400 font-mono">${formatTime(clip.in)} ➔ ${formatTime(clip.out)}</p>
+            </div>
+            <button onclick="playClip(${clip.in})" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-2 py-1 rounded">▶ Ver</button>
+          </div>
+        `;
+      });
+    }
+
+    function playClip(inTime) {
+      video.currentTime = inTime;
+      video.play();
+    }
+
+    // Dibujo Táctico Canvas Básico (Líneas y Focos)
+    canvas.addEventListener('mousedown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      startX = e.clientX - rect.left;
+      startY = e.clientY - rect.top;
+      isDrawing = true;
+    });
+
+    canvas.addEventListener('mouseup', (e) => {
+      if (!isDrawing) return;
+      const rect = canvas.getBoundingClientRect();
+      const endX = e.clientX - rect.left;
+      const endY = e.clientY - rect.top;
+      isDrawing = false;
+
+      ctx.strokeStyle = '#3b82f6';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(endX, endY);
+      ctx.stroke();
+    });
+  </script>
+</body>
+</html>
