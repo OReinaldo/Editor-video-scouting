@@ -3,23 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Editor & Scouting Tactical Suite - MVP v1.1</title>
+  <title>Editor & Scouting Tactical Suite - MVP v1.2</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .tab-active { border-bottom: 3px solid #3b82f6; color: #3b82f6; font-weight: 700; }
     canvas { pointer-events: auto; }
+    input[type=range]::-webkit-slider-runnable-track { background: transparent; }
+    input[type=range]::-moz-range-track { background: transparent; }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans antialiased h-screen flex flex-col overflow-hidden">
 
-  <!-- BARRA SUPERIOR Y NAVEGACIÓN DE PESTAÑAS -->
+  <!-- BARRA SUPERIOR Y NAVEGACIÓN -->
   <header class="bg-slate-800 border-b border-slate-700 px-6 py-2 flex items-center justify-between shrink-0">
     <div class="flex items-center space-x-6">
       <div class="flex items-center space-x-2">
         <div class="bg-blue-600 text-white p-2 rounded-lg font-bold text-sm">ST</div>
         <div>
           <h1 class="font-bold text-base leading-tight">Scouting Tactical Suite</h1>
-          <p class="text-xs text-slate-400">Local-First Engine • Beta v1.1</p>
+          <p class="text-xs text-slate-400">Local-First Engine • Beta v1.2</p>
         </div>
       </div>
 
@@ -42,37 +44,55 @@
   <!-- PESTAÑA 1: EDICIÓN DE VÍDEO -->
   <div id="view-editor" class="flex-1 flex overflow-hidden">
     
-    <!-- ÁREA CENTRAL: REPRODUCTOR Y CANVASTÁCTICO -->
+    <!-- REPRODUCTOR Y CANVASTÁCTICO -->
     <main class="flex-1 flex flex-col bg-black relative justify-center items-center overflow-hidden">
       <div id="mediaContainer" class="relative max-w-full max-h-full aspect-video flex items-center justify-center bg-slate-950">
         <video id="videoPlayer" class="w-full h-full object-contain" ontimeupdate="updateProgress()"></video>
         <canvas id="tacticalCanvas" class="absolute top-0 left-0 w-full h-full cursor-crosshair"></canvas>
       </div>
 
-      <!-- CONTROLES Y TIMELINE -->
+      <!-- PANEL DE CONTROL Y TIMELINE CON MARCADORES VISUALES -->
       <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-slate-800/95 border border-slate-700 p-3 rounded-xl shadow-2xl flex items-center gap-4 w-11/12 max-w-4xl">
-        <button onclick="togglePlay()" id="playBtn" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-bold text-xs">▶ Play</button>
+        <button onclick="togglePlay()" id="playBtn" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-bold text-xs shrink-0">▶ Play</button>
         
+        <!-- TIMELINE CON MARCADORES IN / OUT -->
         <div class="flex-1 flex flex-col gap-1">
-          <input type="range" id="seekBar" value="0" min="0" max="100" step="0.1" oninput="seekVideo()" class="w-full accent-blue-500 cursor-pointer h-2 bg-slate-700 rounded-lg">
+          <div class="relative w-full h-3 bg-slate-700 rounded-lg flex items-center">
+            
+            <!-- Franja Sombreada del Corte -->
+            <div id="rangeHighlight" class="absolute h-full bg-emerald-500/40 border-y border-emerald-400/60 rounded hidden pointer-events-none"></div>
+
+            <!-- Marcador IN (Verde) -->
+            <div id="markerIn" class="absolute top-1/2 -translate-y-1/2 -ml-1.5 w-3 h-5 bg-emerald-500 border border-white rounded-sm shadow-md flex items-center justify-center hidden pointer-events-none z-10">
+              <span class="text-[8px] font-bold text-black uppercase">I</span>
+            </div>
+
+            <!-- Marcador OUT (Naranja) -->
+            <div id="markerOut" class="absolute top-1/2 -translate-y-1/2 -ml-1.5 w-3 h-5 bg-amber-500 border border-white rounded-sm shadow-md flex items-center justify-center hidden pointer-events-none z-10">
+              <span class="text-[8px] font-bold text-black uppercase">O</span>
+            </div>
+
+            <!-- Slider de tiempo transparente por encima -->
+            <input type="range" id="seekBar" value="0" min="0" max="100" step="0.1" oninput="seekVideo()" class="w-full accent-blue-500 cursor-pointer h-3 bg-transparent absolute top-0 left-0 z-20 opacity-90">
+          </div>
+
           <div class="flex justify-between text-[10px] text-slate-400 font-mono">
             <span id="currentTime">00:00</span>
             <span id="durationTime">00:00</span>
           </div>
         </div>
 
-        <div class="flex items-center gap-2 border-l border-slate-700 pl-3">
-          <button onclick="setPoint('in')" class="bg-slate-700 hover:bg-slate-600 px-2.5 py-1.5 rounded text-xs font-semibold">Punto IN [I]</button>
-          <button onclick="setPoint('out')" class="bg-slate-700 hover:bg-slate-600 px-2.5 py-1.5 rounded text-xs font-semibold">Punto OUT [O]</button>
-          <button onclick="saveClip()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded text-xs font-bold">💾 Guardar Corte</button>
+        <!-- CONTROLES IN / OUT -->
+        <div class="flex items-center gap-2 border-l border-slate-700 pl-3 shrink-0">
+          <button onclick="setPoint('in')" class="bg-emerald-700/60 hover:bg-emerald-600 border border-emerald-500/50 text-emerald-200 px-2.5 py-1.5 rounded text-xs font-semibold">Punto IN [I]</button>
+          <button onclick="setPoint('out')" class="bg-amber-700/60 hover:bg-amber-600 border border-amber-500/50 text-amber-200 px-2.5 py-1.5 rounded text-xs font-semibold">Punto OUT [O]</button>
+          <button onclick="saveClip()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-xs font-bold">💾 Guardar Corte</button>
         </div>
       </div>
     </main>
 
     <!-- PANEL LATERAL: DIBUJO Y CORTES -->
     <aside class="w-80 bg-slate-800 border-l border-slate-700 flex flex-col shrink-0">
-      
-      <!-- HERRAMIENTAS DE DIBUJO -->
       <div class="p-4 border-b border-slate-700">
         <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Herramientas Tácticas</h2>
         <div class="grid grid-cols-2 gap-2">
@@ -82,7 +102,6 @@
         <button onclick="clearCanvas()" class="w-full mt-2 bg-slate-700/50 hover:bg-red-600/30 text-red-400 border border-red-500/30 p-1.5 rounded text-xs">🗑️ Limpiar Dibujos</button>
       </div>
 
-      <!-- BIBLIOTECA DE CORTES -->
       <div class="flex-1 p-4 overflow-y-auto">
         <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Cortes del Proyecto</h2>
         <div id="clipsList" class="space-y-2">
@@ -95,7 +114,6 @@
   <!-- PESTAÑA 2: CREADOR DE INFORMES -->
   <div id="view-report" class="flex-1 hidden bg-slate-900 p-8 overflow-y-auto">
     <div class="max-w-4xl mx-auto space-y-6">
-      
       <div class="flex justify-between items-center border-b border-slate-700 pb-4">
         <div>
           <h2 class="text-xl font-bold text-white">Informe Táctico del Partido</h2>
@@ -106,7 +124,6 @@
         </button>
       </div>
 
-      <!-- CONTENEDOR DE BLOQUES -->
       <div id="reportBlocksContainer" class="space-y-4">
         <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 text-center text-slate-500 text-sm">
           No has añadido ningún bloque al informe. Pulsa el botón <strong>"Añadir Bloque Táctico"</strong> para empezar.
@@ -115,7 +132,6 @@
     </div>
   </div>
 
-  <!-- SCRIPT DE LÓGICA -->
   <script>
     const video = document.getElementById('videoPlayer');
     const canvas = document.getElementById('tacticalCanvas');
@@ -129,7 +145,6 @@
     let clips = [];
     let reportBlocks = [];
 
-    // Cambiar Pestañas
     function switchTab(tab) {
       document.getElementById('view-editor').classList.toggle('hidden', tab !== 'editor');
       document.getElementById('view-report').classList.toggle('hidden', tab !== 'report');
@@ -144,7 +159,6 @@
     }
     window.addEventListener('resize', resizeCanvas);
 
-    // Cargar vídeo
     function loadVideo(event) {
       const file = event.target.files[0];
       if (file) {
@@ -165,6 +179,7 @@
         document.getElementById('seekBar').value = (video.currentTime / video.duration) * 100;
         document.getElementById('currentTime').innerText = formatTime(video.currentTime);
         document.getElementById('durationTime').innerText = formatTime(video.duration);
+        updateTimelineMarkers();
       }
     }
 
@@ -177,10 +192,44 @@
       return `${m.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
+    // GESTIÓN DE PUNTOS IN / OUT Y ACTUALIZACIÓN VISUAL DE LA BARRA
     function setPoint(type) {
+      if (!video.duration) return;
       if (type === 'in') pointIn = video.currentTime;
       if (type === 'out') pointOut = video.currentTime;
-      alert(`Punto ${type.toUpperCase()} fijado: ${formatTime(video.currentTime)}`);
+      updateTimelineMarkers();
+    }
+
+    function updateTimelineMarkers() {
+      const markerIn = document.getElementById('markerIn');
+      const markerOut = document.getElementById('markerOut');
+      const rangeHighlight = document.getElementById('rangeHighlight');
+
+      if (pointIn !== null && video.duration) {
+        const inPercent = (pointIn / video.duration) * 100;
+        markerIn.style.left = `${inPercent}%`;
+        markerIn.classList.remove('hidden');
+      } else {
+        markerIn.classList.add('hidden');
+      }
+
+      if (pointOut !== null && video.duration) {
+        const outPercent = (pointOut / video.duration) * 100;
+        markerOut.style.left = `${outPercent}%`;
+        markerOut.classList.remove('hidden');
+      } else {
+        markerOut.classList.add('hidden');
+      }
+
+      if (pointIn !== null && pointOut !== null && pointOut > pointIn && video.duration) {
+        const inPercent = (pointIn / video.duration) * 100;
+        const outPercent = (pointOut / video.duration) * 100;
+        rangeHighlight.style.left = `${inPercent}%`;
+        rangeHighlight.style.width = `${outPercent - inPercent}%`;
+        rangeHighlight.classList.remove('hidden');
+      } else {
+        rangeHighlight.classList.add('hidden');
+      }
     }
 
     function saveClip() {
@@ -191,7 +240,10 @@
       if (name) {
         clips.push({ id: Date.now(), name, in: pointIn, out: pointOut });
         renderClips();
-        pointIn = null; pointOut = null;
+        // Resetear puntos tras guardar
+        pointIn = null; 
+        pointOut = null;
+        updateTimelineMarkers();
       }
     }
 
@@ -212,7 +264,6 @@
 
     function playClip(inTime) { video.currentTime = inTime; video.play(); }
 
-    // Herramientas de Dibujo
     function setTool(tool) {
       currentTool = tool;
       document.getElementById('toolArrow').className = tool === 'arrow' ? 'bg-blue-600 p-2 rounded text-xs font-medium flex items-center justify-center gap-1' : 'bg-slate-700 hover:bg-slate-600 p-2 rounded text-xs font-medium flex items-center justify-center gap-1';
@@ -245,7 +296,6 @@
       }
     });
 
-    // Creador de Informes por Bloques
     function addReportBlock() {
       const container = document.getElementById('reportBlocksContainer');
       if (reportBlocks.length === 0) container.innerHTML = '';
