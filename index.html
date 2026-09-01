@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tactical Video Suite & Smart Motion Tracking Hub</title>
+  <title>Tactical Video Suite & Advanced Video Editor</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- OpenCV.js para Auto-Tracking por Visión Artificial -->
@@ -23,38 +23,41 @@
     ::-webkit-scrollbar-track { background: #0b0f17; }
     ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    
+    input[type=range] {
+      accent-color: #3b82f6;
+    }
   </style>
 </head>
 <body class="bg-[#0b0f17] text-slate-200 antialiased h-screen flex flex-col overflow-hidden select-none">
 
-  <!-- PANTALLA 0: SISTEMA DE IDENTIFICACIÓN DE USUARIO (RBAC) -->
+  <!-- PANTALLA 0: AUTENTICACIÓN Y SELECCIÓN DE ROL -->
   <div id="view-auth" class="fixed inset-0 bg-[#070a0f] z-50 flex items-center justify-center p-4">
     <div class="max-w-md w-full bg-[#111827] border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
       <div class="text-center space-y-2">
         <div class="w-14 h-14 bg-gradient-to-tr from-blue-700 to-indigo-500 text-white rounded-2xl flex items-center justify-center font-extrabold text-lg shadow-xl shadow-blue-500/20 mx-auto border border-blue-400/30">
           STS
         </div>
-        <h2 class="text-xl font-bold text-white tracking-wide">Plataforma de Análisis Táctico</h2>
-        <p class="text-xs text-slate-400">Identifícate para acceder a tu entorno de trabajo con Smart Tracking</p>
+        <h2 class="text-xl font-bold text-white tracking-wide">Plataforma de Análisis y Edición Táctica</h2>
+        <p class="text-xs text-slate-400">Identifícate para acceder a tu entorno de trabajo profesional</p>
       </div>
 
       <form onsubmit="handleLogin(event)" class="space-y-4 text-xs">
         <div>
-          <label class="block font-medium text-slate-400 mb-1">Nombre de Usuario / Técnico</label>
+          <label class="block font-medium text-slate-400 mb-1">Nombre del Técnico / Usuario</label>
           <input type="text" id="loginUsername" required placeholder="Ej: Óscar García" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500">
         </div>
 
         <div>
-          <label class="block font-medium text-slate-400 mb-1">Rol / Perfil de Acceso</label>
+          <label class="block font-medium text-slate-400 mb-1">Rol de Acceso</label>
           <select id="loginRole" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500">
-            <option value="analyst">Analista Táctico / Scouting (Acceso Total + Auto-Tracking)</option>
-            <option value="coach">Primer Entrenador / Staff (Edición e Informes)</option>
-            <option value="player">Jugador / Plantilla (Solo Reproducción)</option>
+            <option value="admin">Administrador (Acceso Total + Ajustes de Sistema)</option>
+            <option value="analyst">Analista Táctico (Edición de Vídeo, Smart Tracking e Informes)</option>
           </select>
         </div>
 
         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-600/20 transition">
-          Acceder a la Suite
+          Acceder al Editor Táctico
         </button>
       </form>
     </div>
@@ -69,36 +72,42 @@
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="font-bold text-sm tracking-wide text-white leading-none">TACTICAL SUITE</h1>
-            <span id="roleBadge" class="bg-blue-500/10 text-blue-400 border border-blue-500/30 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">ANALISTA</span>
+            <h1 class="font-bold text-sm tracking-wide text-white leading-none">TACTICAL VIDEO SUITE</h1>
+            <span id="roleBadge" class="bg-blue-500/10 text-blue-400 border border-blue-500/30 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">ADMINISTRADOR</span>
           </div>
           <p id="userProfileLabel" class="text-[10px] text-slate-400 font-medium mt-0.5">Usuario: -</p>
         </div>
       </div>
 
-      <!-- NAVEGACIÓN -->
+      <!-- NAVEGACIÓN PRINCIPAL -->
       <nav id="workspaceNav" class="hidden flex space-x-1 text-xs font-semibold text-slate-400 border-l border-slate-800 pl-6">
         <button onclick="switchTab('editor')" id="tab-editor" class="py-2 px-3.5 rounded-lg tab-active transition flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-          Editor & Smart Tracking
+          Editor de Vídeo & Tracking
         </button>
         <button onclick="switchTab('report')" id="tab-report" class="py-2 px-3.5 rounded-lg hover:text-slate-200 transition flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           Vídeo Presentación
         </button>
       </nav>
     </div>
 
-    <!-- ACCIONES E IDENTIFICACIÓN -->
+    <!-- ACCIONES, AJUSTES Y SALIDA -->
     <div class="flex items-center space-x-3">
       <div id="projectActions" class="hidden flex items-center space-x-2">
-        <button onclick="saveCurrentProjectToStorage()" class="role-editor-only bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+        <button onclick="saveCurrentProjectToStorage()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
           💾 Guardar
         </button>
         <button onclick="showDashboard()" class="bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/40 text-blue-400 text-xs font-semibold px-3 py-1.5 rounded-lg transition">
           Proyectos
         </button>
       </div>
+
+      <!-- BOTÓN AJUSTES (SOLO ADMIN) -->
+      <button id="adminSettingsBtn" onclick="openSettingsModal()" class="role-admin-only hidden bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+        ⚙️ Ajustes
+      </button>
+
       <button onclick="logout()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition">
         Salir
       </button>
@@ -110,17 +119,17 @@
     <div class="max-w-5xl mx-auto w-full space-y-8">
       <div class="text-center space-y-2 pt-4">
         <h2 class="text-3xl font-extrabold text-white">Centro de Análisis y Proyectos Tácticos</h2>
-        <p class="text-slate-400 text-sm max-w-lg mx-auto">Selecciona un proyecto existente o crea uno nuevo con seguimiento inteligente de jugadores.</p>
+        <p class="text-slate-400 text-sm max-w-lg mx-auto">Edición de vídeo, recortes tácticos, filtros visuales y seguimiento con Smart Tracking.</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="role-editor-only bg-[#111827] border border-slate-800 hover:border-blue-500/50 rounded-2xl p-6 shadow-xl flex flex-col justify-between space-y-4 transition">
+        <div class="bg-[#111827] border border-slate-800 hover:border-blue-500/50 rounded-2xl p-6 shadow-xl flex flex-col justify-between space-y-4 transition">
           <div>
             <div class="w-12 h-12 bg-blue-600/20 text-blue-400 rounded-xl flex items-center justify-center mb-4 border border-blue-500/30">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             </div>
-            <h3 class="text-lg font-bold text-white">Nuevo Proyecto</h3>
-            <p class="text-slate-400 text-xs mt-1">Crea un informe táctico con recortes anotados y auto-tracking.</p>
+            <h3 class="text-lg font-bold text-white">Nuevo Proyecto Táctico</h3>
+            <p class="text-slate-400 text-xs mt-1">Crea un informe con recortes de vídeo anotados, filtros de imagen y seguimiento.</p>
           </div>
           <button onclick="openNewProjectModal()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs py-2.5 rounded-xl transition shadow-lg shadow-blue-600/20">
             + Crear Proyecto
@@ -174,27 +183,157 @@
     </div>
   </div>
 
-  <!-- PANTALLA 2: EDITOR DE VÍDEO TÁCTICO & SMART MOTION TRACKING -->
-  <div id="view-editor" class="flex-1 hidden overflow-hidden">
-    <main class="flex-1 flex flex-col bg-[#070a0f] relative justify-center items-center overflow-hidden p-4 h-full">
+  <!-- MODAL: AJUSTES DEL SISTEMA (EXCLUSIVO ADMINISTRADOR) -->
+  <div id="modalSettings" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+    <div class="bg-[#111827] border border-slate-800 w-full max-w-xl rounded-2xl p-6 shadow-2xl space-y-5">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-amber-400 text-lg">⚙️</span>
+          <h3 class="text-base font-bold text-white">Ajustes Generales del Sistema</h3>
+        </div>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <form onsubmit="handleSaveSettings(event)" class="space-y-4 text-xs">
+        <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 space-y-3">
+          <h4 class="font-bold text-amber-400 uppercase tracking-wider text-[10px]">1. Identidad del Club y Marca</h4>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 mb-1">Nombre Oficial del Club / Entidad</label>
+              <input type="text" id="setClubName" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Marca de Agua en Vídeo Exportado</label>
+              <select id="setWatermark" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
+                <option value="enabled">Activada (Mostrar nombre del club)</option>
+                <option value="disabled">Desactivada (Limpio)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 space-y-3">
+          <h4 class="font-bold text-amber-400 uppercase tracking-wider text-[10px]">2. Motor de Motion Tracking & Algoritmo</h4>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 mb-1">Tasa de Interpolación (FPS)</label>
+              <select id="setTrackingFPS" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
+                <option value="30">30 FPS (Fluidez estándar)</option>
+                <option value="60">60 FPS (Máxima precisión táctica)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Sensibilidad de Búsqueda (OpenCV)</label>
+              <select id="setTrackingSensitivity" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
+                <option value="high">Alta (Recomendada para HD)</option>
+                <option value="medium">Media (Balanceada)</option>
+                <option value="low">Baja (Rendimiento optimizado)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 space-y-3">
+          <h4 class="font-bold text-amber-400 uppercase tracking-wider text-[10px]">3. Exportación de Vídeo Final</h4>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 mb-1">Resolución de Salida</label>
+              <select id="setExportRes" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
+                <option value="1080p">1080p Full HD (1920x1080)</option>
+                <option value="720p">720p HD (1280x720)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Calidad de Renderizado (Bitrate)</label>
+              <select id="setExportBitrate" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
+                <option value="5000000">Alto (5 Mbps)</option>
+                <option value="2500000">Medio (2.5 Mbps)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 space-y-2">
+          <h4 class="font-bold text-amber-400 uppercase tracking-wider text-[10px]">4. Copias de Seguridad y Base de Datos</h4>
+          <div class="flex gap-2 pt-1">
+            <button type="button" onclick="exportDatabaseBackup()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 py-1.5 rounded-lg text-[11px] font-semibold">
+              📥 Exportar Backup (.json)
+            </button>
+            <button type="button" onclick="document.getElementById('importBackupInput').click()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 py-1.5 rounded-lg text-[11px] font-semibold">
+              📤 Importar Backup
+            </button>
+            <input type="file" id="importBackupInput" accept=".json" class="hidden" onchange="importDatabaseBackup(event)">
+          </div>
+        </div>
+
+        <div class="pt-2 flex gap-3">
+          <button type="button" onclick="closeSettingsModal()" class="flex-1 bg-slate-800 text-slate-300 font-semibold py-2 rounded-lg">Cancelar</button>
+          <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2 rounded-lg shadow-lg">Guardar Ajustes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- PANTALLA 2: EDITOR DE VÍDEO COMPLETO, HERRAMIENTAS Y TRACKING -->
+  <div id="view-editor" class="flex-1 hidden overflow-hidden flex">
+    
+    <!-- ÁREA PRINCIPAL DEL REPRODUCTOR Y LÍNEA DE TIEMPO -->
+    <main class="flex-1 flex flex-col bg-[#070a0f] relative justify-center items-center overflow-hidden p-3 h-full">
       
       <!-- OVERLAY CARGA DE VÍDEO -->
       <div id="noVideoOverlay" class="absolute inset-0 bg-slate-950/90 z-20 flex flex-col items-center justify-center space-y-3">
-        <p class="text-slate-400 text-xs">Selecciona un archivo de vídeo fuente para comenzar la edición e ilustración inteligente.</p>
+        <div class="w-16 h-16 bg-blue-600/20 text-blue-400 rounded-2xl flex items-center justify-center border border-blue-500/30 text-2xl mb-1">
+          🎬
+        </div>
+        <h3 class="text-base font-bold text-white">Cargar Vídeo para Análisis</h3>
+        <p class="text-slate-400 text-xs max-w-sm text-center">Selecciona un archivo de vídeo del partido o sesión de entrenamiento (MP4, WebM, MOV).</p>
         <input type="file" id="videoInput" accept="video/*" class="hidden" onchange="loadVideo(event)">
-        <button onclick="document.getElementById('videoInput').click()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-lg transition">
-          📁 Seleccionar Archivo MP4/WebM
+        <button onclick="document.getElementById('videoInput').click()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-5 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2">
+          📁 Seleccionar Archivo de Vídeo
         </button>
       </div>
 
-      <!-- CONTENEDOR REPRODUCTOR Y LIENZO -->
-      <div id="mediaContainer" class="relative max-w-full max-h-full aspect-video flex items-center justify-center bg-black rounded-xl overflow-hidden shadow-2xl border border-slate-800/80">
-        <video id="videoPlayer" class="w-full h-full object-contain" ontimeupdate="onVideoTimeUpdate()"></video>
+      <!-- BARRA RÁPIDA DE HERRAMIENTAS DE VÍDEO (TOP TOOLBAR) -->
+      <div id="quickVideoTools" class="w-11/12 max-w-5xl bg-[#111827]/90 backdrop-blur border border-slate-800 rounded-xl p-2 mb-2 flex items-center justify-between text-xs z-20">
+        <div class="flex items-center gap-2">
+          <span class="text-blue-400 font-bold uppercase text-[10px] tracking-wider px-2 border-r border-slate-800">Herramientas Vídeo:</span>
+          
+          <button onclick="splitVideoAtCurrentTime()" title="Cortar/Dividir el vídeo en la posición actual" class="bg-slate-800 hover:bg-blue-600/30 text-slate-300 hover:text-white px-2.5 py-1 rounded-lg border border-slate-700 flex items-center gap-1 transition">
+            ✂️ Dividir Clip
+          </button>
+
+          <button onclick="rotateVideo()" title="Girar el vídeo 90 grados" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">
+            🔄 Rotar 90°
+          </button>
+
+          <button onclick="toggleFlipVideo()" title="Invertir el vídeo horizontalmente (Espejo)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 transition">
+            🪞 Espejo
+          </button>
+        </div>
+
+        <!-- CONTROL DE ZOOM Y ENCUADRE TÁCTICO -->
+        <div class="flex items-center gap-2 border-l border-slate-800 pl-3">
+          <span class="text-[10px] text-slate-400 font-semibold">🔍 Zoom Táctico:</span>
+          <input type="range" id="videoZoomRange" min="1" max="3" step="0.1" value="1" oninput="setZoomScale(this.value)" class="w-20 accent-blue-500 h-1.5 bg-slate-800 rounded-lg">
+          <span id="zoomValLabel" class="text-[10px] font-mono text-blue-400">1.0x</span>
+        </div>
+
+        <!-- FILTROS DE IMAGEN RÁPIDOS -->
+        <div class="flex items-center gap-1.5 border-l border-slate-800 pl-3">
+          <button onclick="setFilterMode('none')" class="text-[10px] bg-slate-800 text-slate-300 px-2 py-1 rounded border border-slate-700">Normal</button>
+          <button onclick="setFilterMode('contrast')" class="text-[10px] bg-slate-800 text-amber-300 px-2 py-1 rounded border border-slate-700">Alto Contraste</button>
+          <button onclick="setFilterMode('bw')" class="text-[10px] bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700">B/N Táctico</button>
+        </div>
+      </div>
+
+      <!-- CONTENEDOR REPRODUCTOR Y CANVA -->
+      <div id="mediaContainer" class="relative max-w-full max-h-[65vh] aspect-video flex items-center justify-center bg-black rounded-xl overflow-hidden shadow-2xl border border-slate-800/80">
+        <video id="videoPlayer" class="w-full h-full object-contain transition-all duration-200" ontimeupdate="onVideoTimeUpdate()"></video>
         <canvas id="tacticalCanvas" class="absolute top-0 left-0 w-full h-full cursor-crosshair z-10"></canvas>
       </div>
 
-      <!-- BARRA DE CONTROL Y REPRODUCCIÓN -->
-      <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-[#0f172a]/95 backdrop-blur-xl border border-slate-700/80 p-3 rounded-2xl shadow-2xl flex items-center gap-4 w-11/12 max-w-5xl z-20">
+      <!-- BARRA INFERIOR DE CONTROL DE REPRODUCCIÓN & LÍNEA DE TIEMPO -->
+      <div class="mt-3 bg-[#0f172a]/95 backdrop-blur-xl border border-slate-700/80 p-3 rounded-2xl shadow-2xl flex items-center gap-4 w-11/12 max-w-5xl z-20">
         
         <!-- CONTROLES BÁSICOS -->
         <div class="flex items-center gap-1 shrink-0 bg-slate-900/80 p-1 rounded-xl border border-slate-800">
@@ -203,22 +342,21 @@
           <button onclick="stepFrame(1)" title="Fotograma Siguiente" class="p-1.5 hover:bg-slate-800 text-slate-400 hover:text-white rounded-lg transition">▶</button>
         </div>
 
-        <!-- VELOCIDAD DE REPRODUCCIÓN -->
+        <!-- VELOCIDADES DE CÁMARA LENTA Y NORMAL -->
         <div class="flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800 text-[10px] font-bold">
+          <button onclick="setSpeed(0.1)" class="speed-btn text-slate-400 hover:text-white px-1.5 py-1 rounded">0.1x</button>
           <button onclick="setSpeed(0.25)" class="speed-btn text-slate-400 hover:text-white px-1.5 py-1 rounded">0.25x</button>
           <button onclick="setSpeed(0.5)" class="speed-btn text-slate-400 hover:text-white px-1.5 py-1 rounded">0.5x</button>
           <button onclick="setSpeed(1.0)" class="speed-btn text-blue-400 bg-slate-800 px-1.5 py-1 rounded">1.0x</button>
-          <button onclick="setSpeed(1.5)" class="speed-btn text-slate-400 hover:text-white px-1.5 py-1 rounded">1.5x</button>
+          <button onclick="setSpeed(2.0)" class="speed-btn text-slate-400 hover:text-white px-1.5 py-1 rounded">2.0x</button>
         </div>
 
-        <!-- TIMELINE CON INDICADOR DE KEYFRAMES -->
+        <!-- TIMELINE MULTICAPA -->
         <div class="flex-1 flex flex-col gap-1">
           <div class="relative w-full h-3 bg-slate-900/90 rounded-full border border-slate-800 flex items-center">
             <div id="rangeHighlight" class="absolute h-full bg-gradient-to-r from-emerald-500/50 to-teal-500/50 border-y border-emerald-400/80 rounded hidden pointer-events-none"></div>
             <div id="markerIn" class="absolute top-1/2 -translate-y-1/2 -ml-2 w-4 h-6 bg-emerald-500 border-2 border-white rounded shadow-lg flex items-center justify-center hidden pointer-events-none z-10"><span class="text-[9px] font-black text-black">I</span></div>
             <div id="markerOut" class="absolute top-1/2 -translate-y-1/2 -ml-2 w-4 h-6 bg-amber-500 border-2 border-white rounded shadow-lg flex items-center justify-center hidden pointer-events-none z-10"><span class="text-[9px] font-black text-black">O</span></div>
-            <!-- Puntos de Keyframes dibujados dinámicamente -->
-            <div id="keyframesOverlay" class="absolute inset-0 pointer-events-none"></div>
             <input type="range" id="seekBar" value="0" min="0" max="100" step="0.1" oninput="seekVideo()" class="w-full accent-blue-500 cursor-pointer h-3 bg-transparent absolute top-0 left-0 z-20">
           </div>
           <div class="flex justify-between text-[10px] text-slate-400 font-mono-time font-semibold">
@@ -228,82 +366,150 @@
           </div>
         </div>
 
-        <!-- ACCIONES DE MARCA IN / OUT -->
+        <!-- PUNTOS IN / OUT Y CREACIÓN DE CORTE -->
         <div class="flex items-center gap-2 border-l border-slate-800 pl-3 shrink-0">
           <button onclick="setPoint('in')" class="bg-slate-900 border border-emerald-500/40 text-emerald-400 px-2.5 py-1.5 rounded-lg text-xs font-bold transition">IN [I]</button>
           <button onclick="setPoint('out')" class="bg-slate-900 border border-amber-500/40 text-amber-400 px-2.5 py-1.5 rounded-lg text-xs font-bold transition">OUT [O]</button>
-          <button onclick="openClipModal()" class="role-editor-only bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg transition">Guardar Corte</button>
+          <button onclick="openClipModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg transition">Guardar Corte</button>
         </div>
       </div>
     </main>
 
-    <!-- SIDEBAR DE EDICIÓN INTELIGENTE Y HERRAMIENTAS -->
+    <!-- SIDEBAR DE EDICIÓN DE VÍDEO, TELESTRATOR Y SMART TRACKING -->
     <aside class="w-80 bg-[#111827] border-l border-slate-800 flex flex-col shrink-0 z-20 h-full">
-      <div class="p-4 border-b border-slate-800 space-y-3">
-        
-        <!-- PANEL DE EDICIÓN INTELIGENTE (SMART TRACKING) -->
-        <div class="bg-blue-950/40 border border-blue-500/30 rounded-xl p-3 space-y-2">
-          <div class="flex justify-between items-center">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
-              <span>⚡</span> Smart Motion Tracking
-            </h2>
-            <span id="trackingStatusBadge" class="text-[9px] bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded font-mono">LISTO</span>
-          </div>
-          <p class="text-[10px] text-slate-400">Selecciona un elemento de tracking y haz clic sobre el jugador o balón en el vídeo:</p>
-          
-          <div class="grid grid-cols-2 gap-1.5 text-xs">
-            <button onclick="setTool('track_ring')" id="toolTrackRing" class="bg-slate-800 hover:bg-blue-600/30 text-left p-2 rounded-lg border border-slate-700 flex items-center gap-1.5">
-              <span>⭕</span> Anillo Jugador
-            </button>
-            <button onclick="setTool('track_spot')" id="toolTrackSpot" class="bg-slate-800 hover:bg-blue-600/30 text-left p-2 rounded-lg border border-slate-700 flex items-center gap-1.5">
-              <span>💡</span> Foco Táctico
-            </button>
-            <button onclick="setTool('track_ball')" id="toolTrackBall" class="bg-slate-800 hover:bg-blue-600/30 text-left p-2 rounded-lg border border-slate-700 flex items-center gap-1.5">
-              <span>⚽</span> Traza Balón
-            </button>
-            <button onclick="setTool('track_tag')" id="toolTrackTag" class="bg-slate-800 hover:bg-blue-600/30 text-left p-2 rounded-lg border border-slate-700 flex items-center gap-1.5">
-              <span>🏷️</span> Etiqueta Dorsal
-            </button>
-          </div>
-
-          <div class="pt-1 flex justify-between items-center text-[10px]">
-            <button onclick="addKeyframeToActiveTrack()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-2 py-1 rounded">
-              + Añadir Keyframe [K]
-            </button>
-            <button onclick="clearTrackings()" class="text-slate-400 hover:text-red-400 underline">
-              Borrar Trackings
-            </button>
-          </div>
-        </div>
-
-        <!-- TELESTRATOR ESTÁTICO DIBUJO -->
-        <h2 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 pt-1">Telestrator Estático</h2>
-        <div class="grid grid-cols-3 gap-1.5 text-xs">
-          <button onclick="setTool('pencil')" id="toolPencil" class="bg-slate-800 hover:bg-slate-700 p-1.5 rounded-lg text-slate-300 border border-slate-700 text-[11px]">✍️ Pincel</button>
-          <button onclick="setTool('arrow')" id="toolArrow" class="bg-slate-800 hover:bg-slate-700 p-1.5 rounded-lg text-slate-300 border border-slate-700 text-[11px]">➡️ Flecha</button>
-          <button onclick="setTool('curved_arrow')" id="toolCurved" class="bg-slate-800 hover:bg-slate-700 p-1.5 rounded-lg text-slate-300 border border-slate-700 text-[11px]">↪️ Desmarque</button>
-          <button onclick="setTool('zone')" id="toolZone" class="bg-slate-800 hover:bg-slate-700 p-1.5 rounded-lg text-slate-300 border border-slate-700 text-[11px]">🔲 Espacio</button>
-          <button onclick="setTool('text')" id="toolText" class="bg-slate-800 hover:bg-slate-700 p-1.5 rounded-lg text-slate-300 border border-slate-700 text-[11px]">💬 Nota</button>
-          <button onclick="clearStaticDrawings()" class="bg-slate-800 hover:bg-slate-700 p-1.5 rounded-lg text-slate-400 text-[11px]">🗑️ Limpiar</button>
-        </div>
-
-        <!-- PALETA DE COLORES -->
-        <div class="pt-1 flex items-center justify-between">
-          <button onclick="setColor('#3b82f6')" class="w-5 h-5 rounded-full bg-blue-500 ring-2 ring-white/20"></button>
-          <button onclick="setColor('#ef4444')" class="w-5 h-5 rounded-full bg-red-500 ring-2 ring-white/20"></button>
-          <button onclick="setColor('#fde047')" class="w-5 h-5 rounded-full bg-yellow-300 ring-2 ring-white/20"></button>
-          <button onclick="setColor('#10b981')" class="w-5 h-5 rounded-full bg-emerald-400 ring-2 ring-white/20"></button>
-          <button onclick="setColor('#ffffff')" class="w-5 h-5 rounded-full bg-white ring-2 ring-white/20"></button>
-        </div>
+      
+      <!-- PESTAÑAS DEL SIDEBAR -->
+      <div class="flex border-b border-slate-800 text-[11px] font-bold text-slate-400 bg-slate-900/50">
+        <button onclick="switchSidebarTab('videoTools')" id="stab-videoTools" class="flex-1 py-2.5 text-center text-blue-400 border-b-2 border-blue-500 bg-slate-800/50">
+          🎬 Vídeo
+        </button>
+        <button onclick="switchSidebarTab('tracking')" id="stab-tracking" class="flex-1 py-2.5 text-center hover:text-white">
+          ⚡ Tracking
+        </button>
+        <button onclick="switchSidebarTab('telestrator')" id="stab-telestrator" class="flex-1 py-2.5 text-center hover:text-white">
+          ✍️ Dibujo
+        </button>
       </div>
 
-      <!-- LISTADO DE CORTES GUARDADOS -->
-      <div class="flex-1 p-4 overflow-y-auto space-y-3">
-        <div class="flex items-center justify-between">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Cortes del Proyecto</h2>
-          <span id="clipsCountBadge" class="bg-slate-800 text-slate-400 text-[10px] font-mono px-2 py-0.5 rounded-full">0 clips</span>
+      <div class="p-4 flex-1 overflow-y-auto space-y-4">
+        
+        <!-- SECCIÓN 1: AJUSTES DE IMAGEN Y EDICIÓN DE VÍDEO -->
+        <div id="section-videoTools" class="space-y-4">
+          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 space-y-3">
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+              <span>🎚️</span> Ajustes de Imagen y Calidad
+            </h3>
+            
+            <div class="space-y-2 text-xs">
+              <div>
+                <div class="flex justify-between text-[10px] text-slate-400 mb-1">
+                  <span>Brillo del Vídeo</span>
+                  <span id="valBrightness">100%</span>
+                </div>
+                <input type="range" id="sliderBrightness" min="50" max="150" value="100" oninput="applyVideoFilters()" class="w-full accent-blue-500 h-1.5 bg-slate-950 rounded-lg">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-[10px] text-slate-400 mb-1">
+                  <span>Contraste Táctico</span>
+                  <span id="valContrast">100%</span>
+                </div>
+                <input type="range" id="sliderContrast" min="50" max="200" value="100" oninput="applyVideoFilters()" class="w-full accent-blue-500 h-1.5 bg-slate-950 rounded-lg">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-[10px] text-slate-400 mb-1">
+                  <span>Saturación de Color</span>
+                  <span id="valSaturate">100%</span>
+                </div>
+                <input type="range" id="sliderSaturate" min="0" max="200" value="100" oninput="applyVideoFilters()" class="w-full accent-blue-500 h-1.5 bg-slate-950 rounded-lg">
+              </div>
+
+              <div class="pt-1 flex justify-end">
+                <button onclick="resetVideoFilters()" class="text-[10px] text-slate-400 hover:text-amber-400 underline">Restablecer Valores</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONTROL DE AUDIO Y SONIDO -->
+          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 space-y-2">
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+              <span>🔊</span> Control de Audio
+            </h3>
+            <div class="flex items-center gap-3">
+              <input type="range" id="audioVolume" min="0" max="1" step="0.05" value="1" oninput="setVideoVolume(this.value)" class="flex-1 accent-blue-500 h-1.5 bg-slate-950 rounded-lg">
+              <button onclick="toggleMuteVideo()" id="muteBtn" class="bg-slate-800 text-slate-300 text-[10px] font-bold px-2 py-1 rounded border border-slate-700">Mute</button>
+            </div>
+          </div>
         </div>
-        <div id="clipsList" class="space-y-2"></div>
+
+        <!-- SECCIÓN 2: SMART MOTION TRACKING (OPENCV) -->
+        <div id="section-tracking" class="hidden space-y-3">
+          <div class="bg-blue-950/40 border border-blue-500/30 rounded-xl p-3 space-y-2">
+            <div class="flex justify-between items-center">
+              <h2 class="text-xs font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
+                <span>⚡</span> Smart Motion Tracking
+              </h2>
+              <span id="trackingStatusBadge" class="text-[9px] bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded font-mono">LISTO</span>
+            </div>
+            <p class="text-[10px] text-slate-400">Selecciona el tipo de objeto y haz clic sobre el jugador o balón en la pantalla:</p>
+            
+            <div class="grid grid-cols-2 gap-1.5 text-xs">
+              <button onclick="setTool('track_ring')" class="bg-slate-800 hover:bg-blue-600/30 text-left p-2 rounded-lg border border-slate-700 flex items-center gap-1.5">
+                <span>⭕</span> Anillo Jugador
+              </button>
+              <button onclick="setTool('track_spot')" class="bg-slate-800 hover:bg-blue-600/30 text-left p-2 rounded-lg border border-slate-700 flex items-center gap-1.5">
+                <span>💡</span> Foco Táctico
+              </button>
+              <button onclick="setTool('track_ball')" class="bg-slate-800 hover:bg-blue-600/30 text-left p-2 rounded-lg border border-slate-700 flex items-center gap-1.5">
+                <span>⚽</span> Traza Balón
+              </button>
+              <button onclick="setTool('track_tag')" class="bg-slate-800 hover:bg-blue-600/30 text-left p-2 rounded-lg border border-slate-700 flex items-center gap-1.5">
+                <span>🏷️</span> Etiqueta Dorsal
+              </button>
+            </div>
+
+            <div class="pt-1 flex justify-between items-center text-[10px]">
+              <button onclick="addKeyframeToActiveTrack()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-2 py-1 rounded">
+                + Añadir Keyframe [K]
+              </button>
+              <button onclick="clearTrackings()" class="text-slate-400 hover:text-red-400 underline">
+                Borrar Trackings
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 3: TELESTRATOR ESTÁTICO -->
+        <div id="section-telestrator" class="hidden space-y-3">
+          <h2 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Telestrator Estático</h2>
+          <div class="grid grid-cols-3 gap-1.5 text-xs">
+            <button onclick="setTool('pencil')" class="bg-slate-800 hover:bg-slate-700 p-1.5 rounded-lg text-slate-300 border border-slate-700 text-[11px]">✍️ Pincel</button>
+            <button onclick="setTool('arrow')" class="bg-slate-800 hover:bg-slate-700 p-1.5 rounded-lg text-slate-300 border border-slate-700 text-[11px]">➡️ Flecha</button>
+            <button onclick="setTool('curved_arrow')" class="bg-slate-800 hover:bg-slate-700 p-1.5 rounded-lg text-slate-300 border border-slate-700 text-[11px]">↪️ Desmarque</button>
+            <button onclick="setTool('zone')" class="bg-slate-800 hover:bg-slate-700 p-1.5 rounded-lg text-slate-300 border border-slate-700 text-[11px]">🔲 Espacio</button>
+            <button onclick="setTool('text')" class="bg-slate-800 hover:bg-slate-700 p-1.5 rounded-lg text-slate-300 border border-slate-700 text-[11px]">💬 Nota</button>
+            <button onclick="clearStaticDrawings()" class="bg-slate-800 hover:bg-slate-700 p-1.5 rounded-lg text-slate-400 text-[11px]">🗑️ Limpiar</button>
+          </div>
+
+          <div class="pt-2 flex items-center justify-between">
+            <button onclick="setColor('#3b82f6')" class="w-6 h-6 rounded-full bg-blue-500 ring-2 ring-white/20"></button>
+            <button onclick="setColor('#ef4444')" class="w-6 h-6 rounded-full bg-red-500 ring-2 ring-white/20"></button>
+            <button onclick="setColor('#fde047')" class="w-6 h-6 rounded-full bg-yellow-300 ring-2 ring-white/20"></button>
+            <button onclick="setColor('#10b981')" class="w-6 h-6 rounded-full bg-emerald-400 ring-2 ring-white/20"></button>
+            <button onclick="setColor('#ffffff')" class="w-6 h-6 rounded-full bg-white ring-2 ring-white/20"></button>
+          </div>
+        </div>
+
+        <!-- LISTADO DE CORTES DEL PROYECTO -->
+        <div class="pt-3 border-t border-slate-800 space-y-2">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Cortes del Proyecto</h2>
+            <span id="clipsCountBadge" class="bg-slate-800 text-slate-400 text-[10px] font-mono px-2 py-0.5 rounded-full">0 clips</span>
+          </div>
+          <div id="clipsList" class="space-y-2 max-h-48 overflow-y-auto"></div>
+        </div>
+
       </div>
     </aside>
   </div>
@@ -361,9 +567,9 @@
         <div class="flex justify-between items-center border-b border-slate-800 pb-3">
           <div>
             <h2 class="text-base font-extrabold text-white">Escenas de la Presentación Táctica</h2>
-            <p class="text-xs text-slate-400">Combina carátulas explicativas con los cortes tácticos anotados</p>
+            <p class="text-xs text-slate-400">Combina carátulas explicativas con los cortes de vídeo anotados</p>
           </div>
-          <button onclick="addReportBlock()" class="role-editor-only bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition">
+          <button onclick="addReportBlock()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition">
             + Añadir Escena
           </button>
         </div>
@@ -402,7 +608,7 @@
           <button onclick="playPresentationSequence()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-3 rounded-xl shadow-lg transition">
             ▶ Reproducción Secuencial
           </button>
-          <button onclick="exportPresentationToVideo()" class="role-editor-only flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-3 rounded-xl shadow-lg transition">
+          <button onclick="exportPresentationToVideo()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-3 rounded-xl shadow-lg transition">
             🎬 Exportar Vídeo Final (.webm)
           </button>
         </div>
@@ -410,14 +616,24 @@
     </div>
   </div>
 
-  <!-- LÓGICA JAVASCRIPT & MOTOR DE SMART MOTION TRACKING -->
+  <!-- LÓGICA JAVASCRIPT & MOTOR DE EDICIÓN DE VÍDEO -->
   <script>
-    // ESTADO GLOBAL
+    // ESTADO GLOBAL DE LA APLICACIÓN
     let currentUser = null;
     let currentProject = null;
     let projectsStorage = [];
 
-    // ELEMENTOS CANVAS & VÍDEO
+    // CONFIGURACIÓN / AJUSTES DEL SISTEMA
+    let appSettings = {
+      clubName: 'C.F. Profesional',
+      watermark: 'enabled',
+      trackingFPS: '30',
+      trackingSensitivity: 'high',
+      exportRes: '720p',
+      exportBitrate: '2500000'
+    };
+
+    // REPRODUCTOR Y CANVAS
     const video = document.getElementById('videoPlayer');
     const canvas = document.getElementById('tacticalCanvas');
     const ctx = canvas.getContext('2d');
@@ -430,9 +646,15 @@
     let pointOut = null;
     let isLooping = false;
     
-    // DIBUJOS ESTÁTICOS Y SMART TRACKINGS
+    // EDICIÓN Y FILTROS DE VÍDEO
+    let zoomScale = 1.0;
+    let rotationDeg = 0;
+    let isFlipped = false;
+    let currentFilterMode = 'none';
+
+    // DIBUJOS Y TRACKINGS
     let staticDrawings = [];
-    let trackingElements = []; // Array de { id, type, label, color, keyframes: [{t, x, y}] }
+    let trackingElements = [];
     let activeTrackIndex = -1;
 
     let currentTool = 'arrow';
@@ -445,7 +667,13 @@
     let mediaRecorder = null;
     let recordedChunks = [];
 
-    // AUTENTICACIÓN Y ROLES
+    // INICIALIZACIÓN
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSettings();
+      loadProjectsFromLocalStorage();
+    });
+
+    // AUTENTICACIÓN
     function handleLogin(e) {
       e.preventDefault();
       currentUser = {
@@ -456,20 +684,170 @@
       document.getElementById('view-auth').classList.add('hidden');
       document.getElementById('userProfileLabel').innerText = `Técnico: ${currentUser.name}`;
       
-      const roleNames = { analyst: 'Analista Táctico', coach: 'Primer Entrenador', player: 'Jugador' };
+      const roleNames = { admin: 'Administrador', analyst: 'Analista Táctico' };
       document.getElementById('roleBadge').innerText = roleNames[currentUser.role] || currentUser.role;
 
-      if (currentUser.role === 'player') {
-        document.querySelectorAll('.role-editor-only').forEach(el => el.classList.add('hidden'));
+      if (currentUser.role === 'admin') {
+        document.querySelectorAll('.role-admin-only').forEach(el => el.classList.remove('hidden'));
+      } else {
+        document.querySelectorAll('.role-admin-only').forEach(el => el.classList.add('hidden'));
       }
 
-      loadProjectsFromLocalStorage();
       showDashboard();
     }
 
     function logout() {
       currentUser = null;
       document.getElementById('view-auth').classList.remove('hidden');
+    }
+
+    // HERRAMIENTAS EXCLUSIVAS DE EDICIÓN Y FILTROS DE VÍDEO
+    function applyVideoFilters() {
+      const bright = document.getElementById('sliderBrightness').value;
+      const contrast = document.getElementById('sliderContrast').value;
+      const saturate = document.getElementById('sliderSaturate').value;
+
+      document.getElementById('valBrightness').innerText = bright + '%';
+      document.getElementById('valContrast').innerText = contrast + '%';
+      document.getElementById('valSaturate').innerText = saturate + '%';
+
+      let filterCss = `brightness(${bright}%) contrast(${contrast}%) saturate(${saturate}%)`;
+      if (currentFilterMode === 'bw') filterCss += ' grayscale(100%)';
+      if (currentFilterMode === 'contrast') filterCss += ' contrast(160%)';
+
+      video.style.filter = filterCss;
+      
+      const transformCss = `scale(${zoomScale}) rotate(${rotationDeg}deg) scaleX(${isFlipped ? -1 : 1})`;
+      video.style.transform = transformCss;
+    }
+
+    function resetVideoFilters() {
+      document.getElementById('sliderBrightness').value = 100;
+      document.getElementById('sliderContrast').value = 100;
+      document.getElementById('sliderSaturate').value = 100;
+      currentFilterMode = 'none';
+      zoomScale = 1.0;
+      rotationDeg = 0;
+      isFlipped = false;
+      document.getElementById('videoZoomRange').value = 1;
+      document.getElementById('zoomValLabel').innerText = '1.0x';
+      applyVideoFilters();
+    }
+
+    function setFilterMode(mode) {
+      currentFilterMode = mode;
+      applyVideoFilters();
+    }
+
+    function setZoomScale(val) {
+      zoomScale = parseFloat(val);
+      document.getElementById('zoomValLabel').innerText = zoomScale.toFixed(1) + 'x';
+      applyVideoFilters();
+    }
+
+    function rotateVideo() {
+      rotationDeg = (rotationDeg + 90) % 360;
+      applyVideoFilters();
+    }
+
+    function toggleFlipVideo() {
+      isFlipped = !isFlipped;
+      applyVideoFilters();
+    }
+
+    function setVideoVolume(val) {
+      video.volume = parseFloat(val);
+    }
+
+    function toggleMuteVideo() {
+      video.muted = !video.muted;
+      document.getElementById('muteBtn').innerText = video.muted ? 'Unmute' : 'Mute';
+    }
+
+    function splitVideoAtCurrentTime() {
+      if (!currentProject) return alert('Abre un proyecto primero.');
+      const t = video.currentTime;
+      pointIn = Math.max(0, t - 5);
+      pointOut = t;
+      updateMarkers();
+      openClipModal();
+    }
+
+    function switchSidebarTab(tab) {
+      document.getElementById('section-videoTools').classList.toggle('hidden', tab !== 'videoTools');
+      document.getElementById('section-tracking').classList.toggle('hidden', tab !== 'tracking');
+      document.getElementById('section-telestrator').classList.toggle('hidden', tab !== 'telestrator');
+
+      document.getElementById('stab-videoTools').className = tab === 'videoTools' ? 'flex-1 py-2.5 text-center text-blue-400 border-b-2 border-blue-500 bg-slate-800/50' : 'flex-1 py-2.5 text-center hover:text-white';
+      document.getElementById('stab-tracking').className = tab === 'tracking' ? 'flex-1 py-2.5 text-center text-blue-400 border-b-2 border-blue-500 bg-slate-800/50' : 'flex-1 py-2.5 text-center hover:text-white';
+      document.getElementById('stab-telestrator').className = tab === 'telestrator' ? 'flex-1 py-2.5 text-center text-blue-400 border-b-2 border-blue-500 bg-slate-800/50' : 'flex-1 py-2.5 text-center hover:text-white';
+    }
+
+    // AJUSTES DEL SISTEMA
+    function loadSettings() {
+      const data = localStorage.getItem('sts_settings');
+      if (data) appSettings = JSON.parse(data);
+    }
+
+    function openSettingsModal() {
+      if (currentUser?.role !== 'admin') return alert('Acceso restringido a Administradores.');
+      document.getElementById('setClubName').value = appSettings.clubName || '';
+      document.getElementById('setWatermark').value = appSettings.watermark || 'enabled';
+      document.getElementById('setTrackingFPS').value = appSettings.trackingFPS || '30';
+      document.getElementById('setTrackingSensitivity').value = appSettings.trackingSensitivity || 'high';
+      document.getElementById('setExportRes').value = appSettings.exportRes || '720p';
+      document.getElementById('setExportBitrate').value = appSettings.exportBitrate || '2500000';
+      
+      document.getElementById('modalSettings').classList.remove('hidden');
+    }
+
+    function closeSettingsModal() { document.getElementById('modalSettings').classList.add('hidden'); }
+
+    function handleSaveSettings(e) {
+      e.preventDefault();
+      appSettings = {
+        clubName: document.getElementById('setClubName').value,
+        watermark: document.getElementById('setWatermark').value,
+        trackingFPS: document.getElementById('setTrackingFPS').value,
+        trackingSensitivity: document.getElementById('setTrackingSensitivity').value,
+        exportRes: document.getElementById('setExportRes').value,
+        exportBitrate: document.getElementById('setExportBitrate').value
+      };
+
+      localStorage.setItem('sts_settings', JSON.stringify(appSettings));
+      closeSettingsModal();
+      alert('¡Ajustes del sistema actualizados correctamente!');
+    }
+
+    function exportDatabaseBackup() {
+      const backupData = { settings: appSettings, projects: projectsStorage };
+      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `STS_Backup_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+    }
+
+    function importDatabaseBackup(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const imported = JSON.parse(event.target.result);
+          if (imported.projects) projectsStorage = imported.projects;
+          if (imported.settings) appSettings = imported.settings;
+          saveProjectsToLocalStorage();
+          localStorage.setItem('sts_settings', JSON.stringify(appSettings));
+          alert('Backup importado con éxito.');
+          renderProjectsList();
+          closeSettingsModal();
+        } catch(err) {
+          alert('Error al procesar el archivo JSON de respaldo.');
+        }
+      };
+      reader.readAsText(file);
     }
 
     // DASHBOARD & NAVEGACIÓN
@@ -525,7 +903,7 @@
             </div>
             <div class="flex items-center gap-2">
               <button onclick="openProject('${p.id}')" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg">Abrir</button>
-              <button onclick="deleteProject('${p.id}')" class="role-editor-only bg-red-500/10 text-red-400 border border-red-500/30 text-xs px-2.5 py-1.5 rounded-lg">🗑️</button>
+              <button onclick="deleteProject('${p.id}')" class="bg-red-500/10 text-red-400 border border-red-500/30 text-xs px-2.5 py-1.5 rounded-lg">🗑️</button>
             </div>
           </div>`;
       });
@@ -568,7 +946,7 @@
       const idx = projectsStorage.findIndex(p => p.id === currentProject.id);
       if (idx !== -1) projectsStorage[idx] = currentProject;
       saveProjectsToLocalStorage();
-      alert('¡Proyecto guardado con datos de Smart Tracking!');
+      alert('¡Proyecto guardado!');
     }
 
     function deleteProject(id) {
@@ -579,7 +957,7 @@
       }
     }
 
-    // MOTOR DE REPRODUCCIÓN DE VÍDEO
+    // MOTOR DE REPRODUCCIÓN Y CONTROL DE VÍDEO
     function loadVideo(e) {
       const file = e.target.files[0];
       if (file) {
@@ -653,12 +1031,11 @@
       }
     }
 
-    // MOTOR DE EDICIÓN INTELIGENTE & INTERPOLACIÓN DE KEYFRAMES
+    // TELESTRATOR Y SMART TRACKING INTERPOLADO
     function setTool(t) {
       currentTool = t;
       const isTrack = t.startsWith('track_');
       document.getElementById('trackingStatusBadge').innerText = isTrack ? 'MODO TRACKING' : 'LISTO';
-      document.getElementById('trackingStatusBadge').className = isTrack ? 'text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-mono animate-pulse' : 'text-[9px] bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded font-mono';
     }
 
     function setColor(c) { currentColor = c; }
@@ -671,12 +1048,10 @@
       startX = e.clientX - rect.left; startY = e.clientY - rect.top;
       const t = video.currentTime;
 
-      // SI ES HERRAMIENTA DE SMART TRACKING
       if (currentTool.startsWith('track_')) {
         let label = '';
         if (currentTool === 'track_tag') label = prompt('Dorsal / Etiqueta del Jugador:') || '#10';
 
-        // Crear o añadir Keyframe
         const newTrack = {
           id: Date.now(),
           type: currentTool,
@@ -691,7 +1066,6 @@
         return;
       }
 
-      // SI ES HERRAMIENTA DIBUJO ESTÁTICO
       isMouseDown = true;
       if (currentTool === 'pencil') freehandPath = [{ x: startX, y: startY }];
       if (currentTool === 'text') {
@@ -731,11 +1105,9 @@
 
     function addKeyframeToActiveTrack() {
       if (activeTrackIndex === -1 || !trackingElements[activeTrackIndex]) return alert('Selecciona o crea primero un elemento de tracking.');
-      const rect = canvas.getBoundingClientRect();
       const t = video.currentTime;
       const track = trackingElements[activeTrackIndex];
 
-      // Añadir keyframe en el tiempo actual
       const pos = getInterpolatedPosition(track, t) || { x: canvas.width / 2, y: canvas.height / 2 };
       track.keyframes.push({ t: t, x: pos.x, y: pos.y });
       track.keyframes.sort((a, b) => a.t - b.t);
@@ -743,7 +1115,6 @@
       alert(`Keyframe añadido a ${formatTime(t)}`);
     }
 
-    // CÁLCULO MATEMÁTICO DE INTERPOLACIÓN (INTERPOLACIÓN LINEAL DE MOVIMIENTO)
     function getInterpolatedPosition(track, currentTime) {
       const kfs = track.keyframes;
       if (!kfs || kfs.length === 0) return null;
@@ -767,10 +1138,18 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const currentTime = video.currentTime;
 
+      // DIBUJAR MARCA DE AGUA DEL CLUB
+      if (appSettings.watermark === 'enabled' && appSettings.clubName) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+        ctx.font = 'bold 12px Inter';
+        ctx.textAlign = 'right';
+        ctx.fillText(appSettings.clubName.toUpperCase(), canvas.width - 15, 25);
+      }
+
       // 1. DIBUJAR ELEMENTOS ESTÁTICOS
       staticDrawings.forEach(d => drawShape(ctx, d));
 
-      // 2. DIBUJAR ELEMENTOS INTELIGENTES EN MOVIMIENTO (SMART TRACKING)
+      // 2. DIBUJAR SMART TRACKING
       trackingElements.forEach(track => {
         const pos = getInterpolatedPosition(track, currentTime);
         if (!pos) return;
@@ -778,25 +1157,21 @@
         ctx.strokeStyle = track.color; ctx.fillStyle = track.color; ctx.lineWidth = 3;
 
         if (track.type === 'track_ring') {
-          // Anillo ovalado a los pies del jugador
           ctx.beginPath();
           ctx.ellipse(pos.x, pos.y, 35, 18, 0, 0, 2 * Math.PI);
           ctx.stroke();
-          ctx.fillStyle = track.color + '33'; // Transparencia
+          ctx.fillStyle = track.color + '33';
           ctx.fill();
         } else if (track.type === 'track_spot') {
-          // Foco direccional proyectado
           ctx.beginPath();
           ctx.arc(pos.x, pos.y, 45, 0, 2 * Math.PI);
           ctx.stroke();
           ctx.fillStyle = track.color + '22';
           ctx.fill();
         } else if (track.type === 'track_ball') {
-          // Traza y halo de balón
           ctx.beginPath();
           ctx.arc(pos.x, pos.y, 10, 0, 2 * Math.PI);
           ctx.fill();
-          // Traza estela de trayectorias anteriores
           ctx.beginPath();
           track.keyframes.forEach((kf, idx) => {
             if (kf.t <= currentTime) {
@@ -807,7 +1182,6 @@
           ctx.stroke();
           ctx.setLineDash([]);
         } else if (track.type === 'track_tag') {
-          // Etiqueta flotante con el dorsal
           ctx.beginPath();
           ctx.arc(pos.x, pos.y, 5, 0, 2 * Math.PI);
           ctx.fill();
@@ -841,7 +1215,7 @@
       }
     }
 
-    // GESTIÓN DE CORTES
+    // GESTIÓN DE CORTES DEL PROYECTO
     function openClipModal() {
       if (!currentProject) return alert('Abre un proyecto primero.');
       if (pointIn === null || pointOut === null || pointIn >= pointOut) return alert('Establece los puntos IN y OUT en la línea de tiempo.');
@@ -904,7 +1278,7 @@
       }
     }
 
-    // GENERADOR DE VÍDEO PRESENTACIÓN
+    // PRESENTACIÓN TÁCTICA Y EXPORTACIÓN
     function addReportBlock(data = { title: '', text: '', clipId: '' }) {
       const container = document.getElementById('reportBlocksContainer');
       const blockId = Date.now();
@@ -917,7 +1291,7 @@
       card.innerHTML = `
         <div class="flex justify-between items-center">
           <input type="text" class="block-title bg-slate-900 border border-slate-800 text-white text-xs font-bold rounded-lg px-2.5 py-1.5 w-2/3" placeholder="Concepto Táctico" value="${data.title}">
-          <button onclick="document.getElementById('block-${blockId}').remove()" class="role-editor-only text-red-400 text-xs">🗑️</button>
+          <button onclick="document.getElementById('block-${blockId}').remove()" class="text-red-400 text-xs">🗑️</button>
         </div>
         <textarea class="block-text w-full bg-slate-900 border border-slate-800 text-white text-xs rounded-lg p-2 h-16 resize-none" placeholder="Instrucciones tácticas para el equipo...">${data.text}</textarea>
         <div class="flex items-center gap-2 bg-slate-900/80 p-2 rounded-lg border border-slate-800">
@@ -944,18 +1318,18 @@
       presCtx.fillStyle = "#0b0f17"; presCtx.fillRect(0, 0, presCanvas.width, presCanvas.height);
       presCtx.fillStyle = "#1e293b"; presCtx.fillRect(80, 80, presCanvas.width - 160, presCanvas.height - 160);
 
-      presCtx.fillStyle = "#3b82f6"; presCtx.font = "bold 24px Inter";
-      presCtx.fillText("ANÁLISIS TÁCTICO & SCOUTING", 120, 160);
+      presCtx.fillStyle = "#3b82f6"; presCtx.font = "bold 20px Inter";
+      presCtx.fillText((appSettings.clubName || "ANÁLISIS TÁCTICO").toUpperCase(), 120, 150);
 
-      presCtx.fillStyle = "#ffffff"; presCtx.font = "extrabold 44px Inter";
-      presCtx.fillText(title, 120, 240);
+      presCtx.fillStyle = "#ffffff"; presCtx.font = "extrabold 40px Inter";
+      presCtx.fillText(title, 120, 230);
 
-      presCtx.fillStyle = "#94a3b8"; presCtx.font = "22px Inter";
-      presCtx.fillText(subtitle, 120, 300);
+      presCtx.fillStyle = "#94a3b8"; presCtx.font = "20px Inter";
+      presCtx.fillText(subtitle, 120, 290);
 
       if (detail) {
-        presCtx.fillStyle = "#10b981"; presCtx.font = "bold 20px Inter";
-        presCtx.fillText(detail, 120, 360);
+        presCtx.fillStyle = "#10b981"; presCtx.font = "bold 18px Inter";
+        presCtx.fillText(detail, 120, 350);
       }
     }
 
@@ -993,7 +1367,7 @@
                 clearInterval(checkTime);
                 resolve();
               }
-            }, 1000 / 30);
+            }, 1000 / parseInt(appSettings.trackingFPS || 30));
           });
         }
       }
@@ -1007,8 +1381,9 @@
 
     function exportPresentationToVideo() {
       recordedChunks = [];
-      const stream = presCanvas.captureStream(30);
-      mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+      const stream = presCanvas.captureStream(parseInt(appSettings.trackingFPS || 30));
+      const bitrate = parseInt(appSettings.exportBitrate || 2500000);
+      mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm', videoBitsPerSecond: bitrate });
 
       mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
       mediaRecorder.onstop = () => {
@@ -1016,7 +1391,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${currentProject.name}_Informe.webm`;
+        a.download = `${currentProject.name}_${appSettings.clubName || 'Informe'}.webm`;
         a.click();
         alert('Vídeo exportado correctamente.');
       };
