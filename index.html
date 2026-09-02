@@ -151,91 +151,132 @@
     </div>
   </div>
 
-  <!-- PANTALLA 2: ESPACIO DE TRABAJO (EDITOR / PRESENTACIÓN) -->
-  <div id="view-workspace" class="flex-1 hidden flex flex-col overflow-hidden bg-[#070a0f]">
-    
-    <!-- SUB-VISTA: EDITOR Y TRACKING -->
-    <div id="subview-editor" class="flex-1 flex overflow-hidden">
-      <!-- PANEL IZQUIERDO: CONTROLES Y HERRAMIENTAS -->
-      <aside class="w-80 bg-[#111827] border-r border-slate-800 flex flex-col shrink-0">
-        <div class="p-4 border-b border-slate-800">
-          <h3 id="currentProjectTitle" class="font-bold text-sm text-white truncate">Proyecto sin título</h3>
-          <p id="currentProjectSubtitle" class="text-[11px] text-slate-400 mt-0.5">Rival / Partido - Competición</p>
-        </div>
+  <!-- PANTALLA 2: EDITOR DE VÍDEO & TRACKING (OCULTO INICIALMENTE) -->
+  <div id="view-editor" class="flex-1 flex hidden overflow-hidden">
+    <!-- Panel izquierdo: Herramientas y Etiquetado -->
+    <div class="w-80 bg-[#111827] border-r border-slate-800 flex flex-col shrink-0">
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+        <h3 id="currentProjectTitle" class="font-bold text-sm text-white truncate">Proyecto Activo</h3>
+        <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400">Editor Pro</span>
+      </div>
 
-        <div class="flex-1 overflow-y-auto p-4 space-y-5 text-xs">
-          <!-- FUENTE DE VÍDEO -->
-          <div class="space-y-2">
-            <label class="block font-bold text-slate-300 uppercase tracking-wider text-[10px]">1. Cargar Fuente de Vídeo</label>
-            <input type="file" id="videoFileInput" accept="video/*" class="w-full text-xs text-slate-400 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600/20 file:text-blue-400 hover:file:bg-blue-600/30 file:cursor-pointer">
+      <!-- Pestañas de herramientas laterales -->
+      <div class="flex border-b border-slate-800 text-xs font-medium text-slate-400">
+        <button onclick="switchEditorTab('tools')" id="etab-tools" class="flex-1 py-2.5 text-center border-b-2 border-blue-500 text-white bg-slate-900/50">Herramientas</button>
+        <button onclick="switchEditorTab('tags')" id="etab-tags" class="flex-1 py-2.5 text-center hover:text-white">Etiquetas</button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4 space-y-4">
+        <!-- Contenido Herramientas -->
+        <div id="editor-tools-pane" class="space-y-4 text-xs">
+          <div>
+            <label class="block text-slate-400 font-medium mb-1.5">Cargar Fuente de Vídeo</label>
+            <input type="file" id="videoFileInput" accept="video/*" onchange="loadVideoSource(event)" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-slate-300 text-[11px] file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-blue-600 file:text-white file:text-xs">
           </div>
 
-          <!-- HERRAMIENTAS TÁCTICAS -->
-          <div class="space-y-2">
-            <label class="block font-bold text-slate-300 uppercase tracking-wider text-[10px]">2. Herramientas de Dibujo</label>
-            <div class="grid grid-cols-3 gap-2">
-              <button onclick="setTool('pointer')" id="tool-pointer" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 py-2 rounded-lg font-medium text-center transition text-blue-400">Puntero</button>
-              <button onclick="setTool('arrow')" id="tool-arrow" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 py-2 rounded-lg font-medium text-center transition">Flecha</button>
-              <button onclick="setTool('circle')" id="tool-circle" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 py-2 rounded-lg font-medium text-center transition">Círculo</button>
+          <div class="space-y-2 pt-2 border-t border-slate-800">
+            <span class="font-bold text-slate-300 uppercase tracking-wider text-[10px]">Herramientas de Dibujo Táctico</span>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="setDrawingTool('arrow')" id="tool-arrow" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 p-2.5 rounded-lg text-left transition flex items-center gap-2">
+                ↗️ Flecha Táctica
+              </button>
+              <button onclick="setDrawingTool('circle')" id="tool-circle" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 p-2.5 rounded-lg text-left transition flex items-center gap-2">
+                ⭕ Círculo / Jugador
+              </button>
+              <button onclick="setDrawingTool('line')" id="tool-line" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 p-2.5 rounded-lg text-left transition flex items-center gap-2">
+                📏 Línea de Pase
+              </button>
+              <button onclick="setDrawingTool('zone')" id="tool-zone" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 p-2.5 rounded-lg text-left transition flex items-center gap-2">
+                🟩 Zona Presión
+              </button>
             </div>
-          </div>
-
-          <!-- SMART TRACKING (OpenCV) -->
-          <div class="space-y-2 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-            <label class="block font-bold text-amber-400 uppercase tracking-wider text-[10px]">3. Smart Tracking (OpenCV.js)</label>
-            <p class="text-[11px] text-slate-400">Seguimiento automático de jugador o balón mediante visión artificial.</p>
-            <button onclick="toggleSmartTracking()" id="trackingToggleBtn" class="w-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-semibold py-2 rounded-lg transition">
-              Activar Smart Tracking
+            <button onclick="clearCanvasDrawings()" class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 py-2 rounded-lg font-semibold transition">
+              🗑️ Limpiar Anotaciones Canvas
             </button>
-            <div id="opencvStatus" class="text-[10px] text-slate-500 italic">Estado OpenCV: Inicializando...</div>
           </div>
 
-          <!-- RECORTES / CLIPS TÁCTICOS -->
+          <div class="space-y-2 pt-2 border-t border-slate-800">
+            <span class="font-bold text-slate-300 uppercase tracking-wider text-[10px]">Smart Tracking (OpenCV.js)</span>
+            <button onclick="initSmartTracking()" class="w-full bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 border border-indigo-500/40 py-2.5 rounded-lg font-semibold transition flex items-center justify-center gap-2">
+              🎯 Iniciar Auto-Tracking Jugador
+            </button>
+            <p class="text-[10px] text-slate-500">Selecciona un elemento en pantalla para seguir su trayectoria con visión artificial.</p>
+          </div>
+        </div>
+
+        <!-- Contenido Etiquetas / Eventos -->
+        <div id="editor-tags-pane" class="space-y-3 text-xs hidden">
+          <span class="font-bold text-slate-300 uppercase tracking-wider text-[10px]">Categorizar Clip Actual</span>
           <div class="space-y-2">
-            <div class="flex justify-between items-center">
-              <label class="block font-bold text-slate-300 uppercase tracking-wider text-[10px]">4. Clips Tácticos</label>
-              <button onclick="addTacticalClip()" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] px-2 py-1 rounded font-semibold">+ Clip Actual</button>
-            </div>
-            <div id="clipsList" class="space-y-2 max-h-48 overflow-y-auto">
-              <p class="text-[11px] text-slate-500 italic text-center py-4">No hay clips guardados</p>
-            </div>
+            <input type="text" id="tagNameInput" placeholder="Ej: Transición Defensiva Min 42" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white">
+            <select id="tagCategorySelect" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white">
+              <option value="Ataque Organizado">Ataque Organizado</option>
+              <option value="Transición Defensiva">Transición Defensiva</option>
+              <option value="ABP Defensiva">ABP Defensiva</option>
+              <option value="Salida de Balón">Salida de Balón</option>
+            </select>
+            <button onclick="addTagEvent()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-lg shadow">
+              + Registrar Evento en Timeline
+            </button>
+          </div>
+          <div class="pt-2 border-t border-slate-800 space-y-2" id="eventListContainer">
+            <span class="text-slate-500 italic">No hay eventos registrados en este proyecto.</span>
           </div>
         </div>
-      </aside>
-
-      <!-- ÁREA CENTRAL: VÍDEO Y CANVAS -->
-      <main class="flex-1 flex flex-col bg-black relative">
-        <div class="flex-1 relative flex items-center justify-center overflow-hidden">
-          <video id="videoPlayer" class="max-h-full max-w-full object-contain" preload="auto"></video>
-          <canvas id="overlayCanvas" class="absolute inset-0 pointer-events-none"></canvas>
-        </div>
-
-        <!-- BARRA DE REPRODUCCIÓN -->
-        <div class="bg-[#111827] border-t border-slate-800 p-4 space-y-2 shrink-0">
-          <div class="flex items-center justify-between text-xs font-mono-time text-slate-400">
-            <span id="currentTimeDisplay">00:00:00</span>
-            <div class="flex items-center space-x-4">
-              <button onclick="skipTime(-5)" class="hover:text-white">⏪ -5s</button>
-              <button onclick="togglePlay()" id="playPauseBtn" class="bg-blue-600 text-white px-4 py-1.5 rounded-lg font-sans font-semibold hover:bg-blue-500">Reproducir</button>
-              <button onclick="skipTime(5)" class="hover:text-white">+5s ⏩</button>
-            </div>
-            <span id="durationDisplay">00:00:00</span>
-          </div>
-          <input type="range" id="videoSeekbar" value="0" min="0" max="100" step="0.1" class="w-full bg-slate-800 rounded-lg h-1.5 cursor-pointer">
-        </div>
-      </main>
+      </div>
     </div>
 
-    <!-- SUB-VISTA: INFORME / PRESENTACIÓN -->
-    <div id="subview-report" class="flex-1 hidden bg-[#070a0f] p-8 overflow-y-auto">
-      <div class="max-w-4xl mx-auto space-y-6">
-        <div class="bg-[#111827] border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-          <h3 class="text-lg font-bold text-white">Generación de Vídeo Presentación e Informe Táctico</h3>
-          <p class="text-xs text-slate-400">Exporta los clips seleccionados y los gráficos tácticos en un formato listo para la sesión de videoanálisis con la plantilla del club.</p>
-          <div class="flex gap-3 pt-2">
-            <button onclick="generateReportExport()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-lg">
-              📥 Exportar Dossier Táctico (.mp4 / .pdf)
-            </button>
+    <!-- Panel central: Reproductor de Vídeo & Canvas -->
+    <div class="flex-1 bg-[#070a0f] flex flex-col overflow-hidden">
+      <div class="flex-1 flex items-center justify-center p-4 relative bg-black">
+        <div class="relative max-w-full max-h-full flex items-center justify-center shadow-2xl border border-slate-800 rounded-lg overflow-hidden">
+          <video id="mainVideoElement" class="max-h-[65vh] object-contain" ontimeupdate="updateVideoProgress()"></video>
+          <canvas id="drawingCanvas" class="absolute inset-0 pointer-events-auto cursor-crosshair"></canvas>
+        </div>
+      </div>
+
+      <!-- Controles de Reproducción y Timeline -->
+      <div class="bg-[#111827] border-t border-slate-800 p-4 space-y-3 shrink-0">
+        <div class="flex items-center justify-between text-xs font-mono-time text-slate-400">
+          <span id="currentTimeLabel">00:00 / 00:00</span>
+          <div class="flex items-center gap-3">
+            <button onclick="skipVideo(-5)" class="hover:text-white">⏪ -5s</button>
+            <button onclick="togglePlayPause()" id="playPauseBtn" class="bg-blue-600 text-white font-bold px-4 py-1.5 rounded-lg shadow">▶ Play</button>
+            <button onclick="skipVideo(5)" class="hover:text-white">+5s ⏩</button>
+          </div>
+          <span id="playbackRateLabel" class="cursor-pointer" onclick="cyclePlaybackRate()">1.0x</span>
+        </div>
+
+        <!-- Barra Timeline -->
+        <div class="relative flex items-center">
+          <input type="range" id="videoSeekBar" value="0" min="0" max="100" step="0.1" oninput="seekVideo(this.value)" class="w-full bg-slate-800 rounded-lg h-2 cursor-pointer">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANTALLA 3: VÍDEO PRESENTACIÓN / INFORME (OCULTO INICIALMENTE) -->
+  <div id="view-report" class="flex-1 flex hidden bg-[#070a0f] p-8 overflow-y-auto">
+    <div class="max-w-4xl mx-auto w-full space-y-6">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+        <div>
+          <h2 class="text-xl font-bold text-white">Vídeo Presentación e Informe Táctico</h2>
+          <p class="text-xs text-slate-400">Resumen ejecutivo y clips etiquetados listos para exportar</p>
+        </div>
+        <button onclick="exportReportPDF()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow">
+          📥 Exportar Dossier Táctico
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="reportContentContainer">
+        <div class="bg-[#111827] border border-slate-800 rounded-xl p-5 space-y-3">
+          <h4 class="font-bold text-sm text-blue-400">Resumen del Partido / Rival</h4>
+          <p id="reportMatchInfo" class="text-xs text-slate-300">-</p>
+        </div>
+        <div class="bg-[#111827] border border-slate-800 rounded-xl p-5 space-y-3">
+          <h4 class="font-bold text-sm text-blue-400">Eventos Clave Registrados</h4>
+          <div id="reportEventsList" class="space-y-2 text-xs text-slate-300">
+            <span class="text-slate-500 italic">No hay eventos para mostrar.</span>
           </div>
         </div>
       </div>
@@ -291,7 +332,7 @@
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-slate-400 mb-1">Nombre Oficial del Club / Entidad</label>
-              <input type="text" id="setClubName" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white" value="Tactical Club">
+              <input type="text" id="setClubName" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white">
             </div>
             <div>
               <label class="block text-slate-400 mb-1">Marca de Agua en Vídeo Exportado</label>
@@ -357,48 +398,54 @@
           </div>
         </div>
 
-        <div class="pt-2 flex justify-end gap-3">
-          <button type="button" onclick="closeSettingsModal()" class="bg-slate-800 text-slate-300 px-4 py-2 rounded-lg font-semibold">Cancelar</button>
-          <button type="submit" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg font-semibold shadow-lg">Guardar Ajustes</button>
+        <div class="pt-3 flex gap-3">
+          <button type="button" onclick="closeSettingsModal()" class="flex-1 bg-slate-800 text-slate-300 font-semibold py-2 rounded-lg">Cancelar</button>
+          <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2 rounded-lg shadow-lg">Guardar Ajustes</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- SCRIPT LÓGICO DE LA APLICACIÓN -->
+  <!-- SCRIPT DE CONTROL Y LÓGICA DE LA APLICACIÓN -->
   <script>
     let currentUser = null;
     let currentRole = 'admin';
     let currentProject = null;
-    let activeTool = 'pointer';
-    let isTrackingActive = false;
-    let clips = [];
+    let projectsDB = JSON.parse(localStorage.getItem('sts_projects_db')) || [];
+    let systemSettings = JSON.parse(localStorage.getItem('sts_settings')) || {
+      clubName: 'Club Profesional',
+      watermark: 'enabled',
+      trackingFPS: '30',
+      trackingSensitivity: 'high',
+      exportRes: '1080p',
+      exportBitrate: '5000000'
+    };
 
-    // Verificación inicial de OpenCV.js
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        const statusEl = document.getElementById('opencvStatus');
-        if (typeof cv !== 'undefined' && cv.Mat) {
-          statusEl.textContent = 'Estado OpenCV: Listo y Operativo';
-          statusEl.className = 'text-[10px] text-emerald-400 italic';
-        } else {
-          statusEl.textContent = 'Estado OpenCV: Modo simulación activo';
-          statusEl.className = 'text-[10px] text-amber-400 italic';
-        }
-      }, 1500);
+    let currentDrawingTool = 'arrow';
+    let isDrawing = false;
+    let startX = 0, startY = 0;
+    let canvasDrawings = [];
+
+    // Inicialización al cargar la página
+    window.addEventListener('DOMContentLoaded', () => {
       loadProjectsList();
+      setupCanvasDrawing();
     });
 
-    function handleLogin(event) {
-      event.preventDefault();
-      currentUser = document.getElementById('loginUsername').value;
-      currentRole = document.getElementById('loginRole').value;
+    function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('loginUsername').value.trim();
+      const role = document.getElementById('loginRole').value;
+      if (!username) return;
+
+      currentUser = username;
+      currentRole = role;
 
       document.getElementById('userProfileLabel').textContent = `Usuario: ${currentUser}`;
       const badge = document.getElementById('roleBadge');
-      badge.textContent = currentRole === 'admin' ? 'ADMINISTRADOR' : 'ANALISTA TÁCTICO';
-
-      if (currentRole === 'admin') {
+      badge.textContent = role === 'admin' ? 'ADMINISTRADOR' : 'ANALISTA TÁCTICO';
+      
+      if (role === 'admin') {
         document.querySelectorAll('.role-admin-only').forEach(el => el.classList.remove('hidden'));
       } else {
         document.querySelectorAll('.role-admin-only').forEach(el => el.classList.add('hidden'));
@@ -413,16 +460,54 @@
       document.getElementById('view-auth').classList.remove('hidden');
       document.getElementById('workspaceNav').classList.add('hidden');
       document.getElementById('projectActions').classList.add('hidden');
-      document.getElementById('view-workspace').classList.add('hidden');
+      document.getElementById('view-editor').classList.add('hidden');
+      document.getElementById('view-report').classList.add('hidden');
       document.getElementById('view-dashboard').classList.add('hidden');
     }
 
     function showDashboard() {
+      document.getElementById('view-auth').classList.add('hidden');
+      document.getElementById('view-editor').classList.add('hidden');
+      document.getElementById('view-report').classList.add('hidden');
       document.getElementById('view-dashboard').classList.remove('hidden');
-      document.getElementById('view-workspace').classList.add('hidden');
-      document.getElementById('workspaceNav').classList.add('hidden');
+      document.getElementById('workspaceNav').classList.remove('hidden');
       document.getElementById('projectActions').classList.add('hidden');
       loadProjectsList();
+    }
+
+    function switchTab(tab) {
+      document.getElementById('view-dashboard').classList.add('hidden');
+      document.getElementById('view-editor').classList.add('hidden');
+      document.getElementById('view-report').classList.add('hidden');
+
+      document.getElementById('tab-editor').className = "py-2 px-3.5 rounded-lg hover:text-slate-200 transition flex items-center gap-2";
+      document.getElementById('tab-report').className = "py-2 px-3.5 rounded-lg hover:text-slate-200 transition flex items-center gap-2";
+
+      if (tab === 'editor') {
+        document.getElementById('view-editor').classList.remove('hidden');
+        document.getElementById('tab-editor').className = "py-2 px-3.5 rounded-lg tab-active transition flex items-center gap-2";
+        document.getElementById('projectActions').classList.remove('hidden');
+      } else if (tab === 'report') {
+        document.getElementById('view-report').classList.remove('hidden');
+        document.getElementById('tab-report').className = "py-2 px-3.5 rounded-lg tab-active transition flex items-center gap-2";
+        document.getElementById('projectActions').classList.remove('hidden');
+        renderReportView();
+      }
+    }
+
+    function switchEditorTab(tab) {
+      document.getElementById('etab-tools').className = "flex-1 py-2.5 text-center hover:text-white";
+      document.getElementById('etab-tags').className = "flex-1 py-2.5 text-center hover:text-white";
+      document.getElementById('editor-tools-pane').classList.add('hidden');
+      document.getElementById('editor-tags-pane').classList.add('hidden');
+
+      if (tab === 'tools') {
+        document.getElementById('etab-tools').className = "flex-1 py-2.5 text-center border-b-2 border-blue-500 text-white bg-slate-900/50";
+        document.getElementById('editor-tools-pane').classList.remove('hidden');
+      } else {
+        document.getElementById('etab-tags').className = "flex-1 py-2.5 text-center border-b-2 border-blue-500 text-white bg-slate-900/50";
+        document.getElementById('editor-tags-pane').classList.remove('hidden');
+      }
     }
 
     function openNewProjectModal() {
@@ -433,195 +518,85 @@
       document.getElementById('modalNewProject').classList.add('hidden');
     }
 
-    function handleCreateProject(event) {
-      event.preventDefault();
-      const name = document.getElementById('npName').value;
-      const match = document.getElementById('npMatch').value || 'Partido Amistoso';
-      const comp = document.getElementById('npComp').value || 'General';
+    function handleCreateProject(e) {
+      e.preventDefault();
+      const name = document.getElementById('npName').value.trim();
+      const match = document.getElementById('npMatch').value.trim() || 'Partido amistoso';
+      const comp = document.getElementById('npComp').value.trim() || 'General';
 
-      currentProject = {
-        id: 'PRJ-' + Date.now(),
+      const newProj = {
+        id: 'proj_' + Date.now(),
         name,
         match,
         comp,
         createdAt: new Date().toLocaleDateString(),
-        clips: []
+        events: []
       };
 
-      saveProjectToStorage(currentProject);
+      projectsDB.push(newProj);
+      localStorage.setItem('sts_projects_db', JSON.stringify(projectsDB));
       closeNewProjectModal();
-      openProjectWorkspace(currentProject);
-    }
-
-    function openProjectWorkspace(project) {
-      currentProject = project;
-      clips = project.clips || [];
-      document.getElementById('currentProjectTitle').textContent = project.name;
-      document.getElementById('currentProjectSubtitle').textContent = `${project.match} - ${project.comp}`;
-
-      document.getElementById('view-dashboard').classList.add('hidden');
-      document.getElementById('view-workspace').classList.remove('hidden');
-      document.getElementById('workspaceNav').classList.remove('hidden');
-      document.getElementById('projectActions').classList.remove('hidden');
-      renderClips();
-      switchTab('editor');
-    }
-
-    function switchTab(tabName) {
-      document.getElementById('subview-editor').classList.add('hidden');
-      document.getElementById('subview-report').classList.add('hidden');
-      document.getElementById('tab-editor').classList.remove('tab-active');
-      document.getElementById('tab-report').classList.remove('tab-active');
-
-      if (tabName === 'editor') {
-        document.getElementById('subview-editor').classList.remove('hidden');
-        document.getElementById('tab-editor').classList.add('tab-active');
-      } else if (tabName === 'report') {
-        document.getElementById('subview-report').classList.remove('hidden');
-        document.getElementById('tab-report').classList.add('tab-active');
-      }
-    }
-
-    function setTool(toolName) {
-      activeTool = toolName;
-      ['pointer', 'arrow', 'circle'].forEach(t => {
-        const btn = document.getElementById(`tool-${t}`);
-        if (t === toolName) {
-          btn.className = 'bg-blue-600 text-white border border-blue-500 py-2 rounded-lg font-medium text-center transition';
-        } else {
-          btn.className = 'bg-slate-800 hover:bg-slate-700 border border-slate-700 py-2 rounded-lg font-medium text-center transition text-slate-300';
-        }
-      });
-    }
-
-    function toggleSmartTracking() {
-      isTrackingActive = !isTrackingActive;
-      const btn = document.getElementById('trackingToggleBtn');
-      if (isTrackingActive) {
-        btn.className = 'w-full bg-amber-500 text-slate-950 font-bold py-2 rounded-lg transition shadow-lg shadow-amber-500/20';
-        btn.textContent = 'Smart Tracking Activado (Seguimiento)';
-      } else {
-        btn.className = 'w-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-semibold py-2 rounded-lg transition';
-        btn.textContent = 'Activar Smart Tracking';
-      }
-    }
-
-    function addTacticalClip() {
-      const video = document.getElementById('videoPlayer');
-      const time = video.currentTime || 0;
-      const clip = {
-        id: 'CLIP-' + Date.now(),
-        title: `Clip Táctico ${clips.length + 1}`,
-        time: formatTime(time)
-      };
-      clips.push(clip);
-      renderClips();
-    }
-
-    function renderClips() {
-      const container = document.getElementById('clipsList');
-      if (clips.length === 0) {
-        container.innerHTML = '<p class="text-[11px] text-slate-500 italic text-center py-4">No hay clips guardados</p>';
-        return;
-      }
-      container.innerHTML = clips.map((c, idx) => `
-        <div class="bg-slate-900 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <div>
-            <div class="font-bold text-white text-[11px]">${c.title}</div>
-            <div class="text-[10px] text-slate-400 font-mono-time">Min: ${c.time}</div>
-          </div>
-          <button onclick="removeClip(${idx})" class="text-red-400 hover:text-red-300 text-xs px-1.5 py-1">✕</button>
-        </div>
-      `).join('');
-    }
-
-    function removeClip(index) {
-      clips.splice(index, 1);
-      renderClips();
-    }
-
-    function formatTime(seconds) {
-      const mins = Math.floor(seconds / 60);
-      const secs = Math.floor(seconds % 60);
-      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    function togglePlay() {
-      const video = document.getElementById('videoPlayer');
-      const btn = document.getElementById('playPauseBtn');
-      if (video.paused) {
-        video.play();
-        btn.textContent = 'Pausar';
-      } else {
-        video.pause();
-        btn.textContent = 'Reproducir';
-      }
-    }
-
-    function skipTime(seconds) {
-      const video = document.getElementById('videoPlayer');
-      video.currentTime = Math.max(0, Math.min(video.duration || 0, video.currentTime + seconds));
-    }
-
-    // Gestión de Proyectos en LocalStorage
-    function saveProjectToStorage(proj) {
-      let saved = JSON.parse(localStorage.getItem('sts_projects') || '[]');
-      const idx = saved.findIndex(p => p.id === proj.id);
-      proj.clips = clips;
-      if (idx >= 0) {
-        saved[idx] = proj;
-      } else {
-        saved.push(proj);
-      }
-      localStorage.setItem('sts_projects', JSON.stringify(saved));
-    }
-
-    function saveCurrentProjectToStorage() {
-      if (!currentProject) return;
-      saveProjectToStorage(currentProject);
-      alert('Proyecto guardado correctamente.');
+      loadProjectsList();
+      openProject(newProj.id);
     }
 
     function loadProjectsList() {
-      let saved = JSON.parse(localStorage.getItem('sts_projects') || '[]');
-      document.getElementById('savedProjectsCount').textContent = `${saved.length} proyectos`;
       const container = document.getElementById('projectsList');
-      if (saved.length === 0) {
-        container.innerHTML = '<p class="text-xs text-slate-500 italic text-center py-10">No hay proyectos guardados en el sistema</p>';
+      document.getElementById('savedProjectsCount').textContent = `${projectsDB.length} proyectos`;
+
+      if (projectsDB.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-10">No hay proyectos guardados todavía.</p>`;
         return;
       }
-      container.innerHTML = saved.map(p => `
-        <div class="bg-slate-900 border border-slate-800 hover:border-blue-500/40 p-3.5 rounded-xl flex items-center justify-between transition">
-          <div>
-            <h4 class="font-bold text-white text-xs">${p.name}</h4>
-            <p class="text-[11px] text-slate-400 mt-0.5">${p.match} • ${p.comp} (${p.createdAt})</p>
+
+      container.innerHTML = projectsDB.map(p => `
+        <div class="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl p-4 flex items-center justify-between transition">
+          <div class="space-y-1">
+            <h4 class="font-bold text-white text-sm">${p.name}</h4>
+            <p class="text-slate-400 text-[11px]">${p.match} (${p.comp}) • Creado el ${p.createdAt}</p>
           </div>
           <div class="flex items-center gap-2">
-            <button onclick="loadProject('${p.id}')" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">Abrir</button>
-            <button onclick="deleteProject('${p.id}')" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs px-2 py-1.5 rounded-lg transition">🗑️</button>
+            <button onclick="openProject('${p.id}')" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">Abrir</button>
+            <button onclick="deleteProject('${p.id}')" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs px-2.5 py-1.5 rounded-lg transition">🗑️</button>
           </div>
         </div>
       `).join('');
     }
 
-    function loadProject(id) {
-      let saved = JSON.parse(localStorage.getItem('sts_projects') || '[]');
-      const p = saved.find(item => item.id === id);
-      if (p) {
-        openProjectWorkspace(p);
-      }
+    function openProject(id) {
+      currentProject = projectsDB.find(p => p.id === id);
+      if (!currentProject) return;
+
+      document.getElementById('currentProjectTitle').textContent = currentProject.name;
+      renderEventsList();
+      switchTab('editor');
     }
 
     function deleteProject(id) {
       if (!confirm('¿Estás seguro de eliminar este proyecto táctico?')) return;
-      let saved = JSON.parse(localStorage.getItem('sts_projects') || '[]');
-      saved = saved.filter(p => p.id !== id);
-      localStorage.setItem('sts_projects', JSON.stringify(saved));
+      projectsDB = projectsDB.filter(p => p.id !== id);
+      localStorage.setItem('sts_projects_db', JSON.stringify(projectsDB));
       loadProjectsList();
     }
 
-    // Modal de Ajustes (Admin)
+    function saveCurrentProjectToStorage() {
+      if (!currentProject) return;
+      const idx = projectsDB.findIndex(p => p.id === currentProject.id);
+      if (idx !== -1) {
+        projectsDB[idx] = currentProject;
+        localStorage.setItem('sts_projects_db', JSON.stringify(projectsDB));
+        alert('Proyecto guardado correctamente.');
+      }
+    }
+
+    // Configuración y Ajustes (Admin)
     function openSettingsModal() {
+      document.getElementById('setClubName').value = systemSettings.clubName;
+      document.getElementById('setWatermark').value = systemSettings.watermark;
+      document.getElementById('setTrackingFPS').value = systemSettings.trackingFPS;
+      document.getElementById('setTrackingSensitivity').value = systemSettings.trackingSensitivity;
+      document.getElementById('setExportRes').value = systemSettings.exportRes;
+      document.getElementById('setExportBitrate').value = systemSettings.exportBitrate;
       document.getElementById('modalSettings').classList.remove('hidden');
     }
 
@@ -629,9 +604,9 @@
       document.getElementById('modalSettings').classList.add('hidden');
     }
 
-    function handleSaveSettings(event) {
-      event.preventDefault();
-      const settings = {
+    function handleSaveSettings(e) {
+      e.preventDefault();
+      systemSettings = {
         clubName: document.getElementById('setClubName').value,
         watermark: document.getElementById('setWatermark').value,
         trackingFPS: document.getElementById('setTrackingFPS').value,
@@ -639,45 +614,276 @@
         exportRes: document.getElementById('setExportRes').value,
         exportBitrate: document.getElementById('setExportBitrate').value
       };
-      localStorage.setItem('sts_settings', JSON.stringify(settings));
+      localStorage.setItem('sts_settings', JSON.stringify(systemSettings));
       closeSettingsModal();
-      alert('Ajustes del sistema guardados correctamente.');
+      alert('Ajustes del sistema guardados con éxito.');
     }
 
     function exportDatabaseBackup() {
-      const data = {
-        projects: JSON.parse(localStorage.getItem('sts_projects') || '[]'),
-        settings: JSON.parse(localStorage.getItem('sts_settings') || '{}'),
-        exportedAt: new Date().toISOString()
-      };
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `STS_Backup_${new Date().toISOString().slice(0,10)}.json`;
-      a.click();
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ projects: projectsDB, settings: systemSettings }));
+      const dlAnchor = document.createElement('a');
+      dlAnchor.setAttribute("href", dataStr);
+      dlAnchor.setAttribute("download", `STS_Backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(dlAnchor);
+      dlAnchor.click();
+      dlAnchor.remove();
     }
 
-    function importDatabaseBackup(event) {
-      const file = event.target.files[0];
+    function importDatabaseBackup(e) {
+      const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function(evt) {
         try {
-          const data = JSON.parse(e.target.result);
-          if (data.projects) localStorage.setItem('sts_projects', JSON.stringify(data.projects));
-          if (data.settings) localStorage.setItem('sts_settings', JSON.stringify(data.settings));
+          const parsed = JSON.parse(evt.target.result);
+          if (parsed.projects) projectsDB = parsed.projects;
+          if (parsed.settings) systemSettings = parsed.settings;
+          localStorage.setItem('sts_projects_db', JSON.stringify(projectsDB));
+          localStorage.setItem('sts_settings', JSON.stringify(systemSettings));
           loadProjectsList();
-          alert('Copia de seguridad restaurada con éxito.');
+          alert('Backup importado correctamente.');
         } catch (err) {
-          alert('Error al procesar el fichero JSON de respaldo.');
+          alert('Error al importar el archivo JSON.');
         }
       };
       reader.readAsText(file);
     }
 
-    function generateReportExport() {
-      alert('Generando vídeo presentación y dossier táctico integrado... El archivo estará disponible en breve.');
+    // Reproductor y Edición de Vídeo
+    function loadVideoSource(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const videoEl = document.getElementById('mainVideoElement');
+      videoEl.src = URL.createObjectURL(file);
+      videoEl.load();
+    }
+
+    function togglePlayPause() {
+      const videoEl = document.getElementById('mainVideoElement');
+      const btn = document.getElementById('playPauseBtn');
+      if (videoEl.paused) {
+        videoEl.play();
+        btn.textContent = '⏸ Pausa';
+      } else {
+        videoEl.pause();
+        btn.textContent = '▶ Play';
+      }
+    }
+
+    function updateVideoProgress() {
+      const videoEl = document.getElementById('mainVideoElement');
+      const seekBar = document.getElementById('videoSeekBar');
+      const timeLabel = document.getElementById('currentTimeLabel');
+      
+      if (!isNaN(videoEl.duration)) {
+        const percent = (videoEl.currentTime / videoEl.duration) * 100;
+        seekBar.value = percent;
+        timeLabel.textContent = `${formatTime(videoEl.currentTime)} / ${formatTime(videoEl.duration)}`;
+      }
+    }
+
+    function seekVideo(val) {
+      const videoEl = document.getElementById('mainVideoElement');
+      if (!isNaN(videoEl.duration)) {
+        videoEl.currentTime = (val / 100) * videoEl.duration;
+      }
+    }
+
+    function skipVideo(sec) {
+      const videoEl = document.getElementById('mainVideoElement');
+      videoEl.currentTime = Math.max(0, Math.min(videoEl.duration, videoEl.currentTime + sec));
+    }
+
+    function cyclePlaybackRate() {
+      const videoEl = document.getElementById('mainVideoElement');
+      const rates = [0.5, 1.0, 1.5, 2.0];
+      let idx = rates.indexOf(videoEl.playbackRate);
+      idx = (idx + 1) % rates.length;
+      videoEl.playbackRate = rates[idx];
+      document.getElementById('playbackRateLabel').textContent = rates[idx] + 'x';
+    }
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+    }
+
+    // Dibujo Táctico en Canvas
+    function setDrawingTool(tool) {
+      currentDrawingTool = tool;
+      ['arrow', 'circle', 'line', 'zone'].forEach(t => {
+        const btn = document.getElementById(`tool-${t}`);
+        if (btn) btn.style.borderColor = t === tool ? '#3b82f6' : '#1e293b';
+      });
+    }
+
+    function setupCanvasDrawing() {
+      const canvas = document.getElementById('drawingCanvas');
+      const ctx = canvas.getContext('2d');
+      const videoEl = document.getElementById('mainVideoElement');
+
+      function resizeCanvas() {
+        canvas.width = videoEl.clientWidth || 640;
+        canvas.height = videoEl.clientHeight || 360;
+        redrawCanvas();
+      }
+
+      window.addEventListener('resize', resizeCanvas);
+      videoEl.addEventListener('loadedmetadata', resizeCanvas);
+
+      canvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        const rect = canvas.getBoundingClientRect();
+        startX = e.clientX - rect.left;
+        startY = e.clientY - rect.top;
+      });
+
+      canvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+        const rect = canvas.getBoundingClientRect();
+        const currentX = e.clientX - rect.left;
+        const currentY = e.clientY - rect.top;
+        redrawCanvas();
+        drawShape(ctx, startX, startY, currentX, currentY, currentDrawingTool, '#3b82f6');
+      });
+
+      canvas.addEventListener('mouseup', (e) => {
+        if (!isDrawing) return;
+        isDrawing = false;
+        const rect = canvas.getBoundingClientRect();
+        const endX = e.clientX - rect.left;
+        const endY = e.clientY - rect.top;
+        canvasDrawings.push({ tool: currentDrawingTool, startX, startY, endX, endY, color: '#3b82f6' });
+      });
+    }
+
+    function redrawCanvas() {
+      const canvas = document.getElementById('drawingCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvasDrawings.forEach(d => {
+        drawShape(ctx, d.startX, d.startY, d.endX, d.endY, d.tool, d.color);
+      });
+    }
+
+    function drawShape(ctx, x1, y1, x2, y2, tool, color) {
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 3;
+
+      if (tool === 'line' || tool === 'arrow') {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+        if (tool === 'arrow') {
+          const angle = Math.atan2(y2 - y1, x2 - x1);
+          ctx.beginPath();
+          ctx.moveTo(x2, y2);
+          ctx.lineTo(x2 - 12 * Math.cos(angle - Math.PI / 6), y2 - 12 * Math.sin(angle - Math.PI / 6));
+          ctx.lineTo(x2 - 12 * Math.cos(angle + Math.PI / 6), y2 - 12 * Math.sin(angle + Math.PI / 6));
+          ctx.fill();
+        }
+      } else if (tool === 'circle') {
+        const radius = Math.hypot(x2 - x1, y2 - y1);
+        ctx.beginPath();
+        ctx.arc(x1, y1, radius, 0, 2 * Math.PI);
+        ctx.stroke();
+      } else if (tool === 'zone') {
+        ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
+        ctx.fillRect(Math.min(x1,x2), Math.min(y1,y2), Math.abs(x2-x1), Math.abs(y2-y1));
+        ctx.strokeRect(Math.min(x1,x2), Math.min(y1,y2), Math.abs(x2-x1), Math.abs(y2-y1));
+      }
+    }
+
+    function clearCanvasDrawings() {
+      canvasDrawings = [];
+      redrawCanvas();
+    }
+
+    // Smart Tracking OpenCV mockup / hook
+    function initSmartTracking() {
+      if (typeof cv === 'undefined') {
+        alert('OpenCV.js se está cargando o no está disponible. Asegure conexión a internet.');
+        return;
+      }
+      alert('Smart Tracking OpenCV activado. Haga clic y arrastre sobre el jugador en el vídeo para iniciar el seguimiento por visión artificial.');
+    }
+
+    // Etiquetado y Timeline
+    function addTagEvent() {
+      if (!currentProject) return;
+      const name = document.getElementById('tagNameInput').value.trim() || 'Evento Táctico';
+      const category = document.getElementById('tagCategorySelect').value;
+      const videoEl = document.getElementById('mainVideoElement');
+      const timestamp = videoEl ? videoEl.currentTime : 0;
+
+      currentProject.events.push({
+        id: 'ev_' + Date.now(),
+        name,
+        category,
+        timestamp: formatTime(timestamp)
+      });
+
+      document.getElementById('tagNameInput').value = '';
+      renderEventsList();
+      saveCurrentProjectToStorage();
+    }
+
+    function renderEventsList() {
+      const container = document.getElementById('eventListContainer');
+      if (!currentProject || currentProject.events.length === 0) {
+        container.innerHTML = `<span class="text-slate-500 italic text-xs">No hay eventos registrados en este proyecto.</span>`;
+        return;
+      }
+
+      container.innerHTML = currentProject.events.map(ev => `
+        bg-slate-900 border border-slate-800 rounded-lg p-2.5 flex items-center justify-between text-xs">
+          <div>
+            <span class="font-bold text-white">${ev.name}</span>
+            <div class="text-[10px] text-slate-400">${ev.category} • ${ev.timestamp}</div>
+          </div>
+          <button onclick="deleteEvent('${ev.id}')" class="text-red-400 hover:text-red-300">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function deleteEvent(id) {
+      if (!currentProject) return;
+      currentProject.events = currentProject.events.filter(ev => ev.id !== id);
+      renderEventsList();
+      saveCurrentProjectToStorage();
+    }
+
+    function renderReportView() {
+      if (!currentProject) return;
+      document.getElementById('reportMatchInfo').innerHTML = `
+        <strong>Proyecto:</strong> ${currentProject.name}<br>
+        <strong>Rival / Partido:</strong> ${currentProject.match}<br>
+        <strong>Competición:</strong> ${currentProject.comp}<br>
+        <strong>Entidad:</strong> ${systemSettings.clubName}
+      `;
+
+      const evContainer = document.getElementById('reportEventsList');
+      if (currentProject.events.length === 0) {
+        evContainer.innerHTML = `<span class="text-slate-500 italic">No hay eventos registrados.</span>`;
+        return;
+      }
+
+      evContainer.innerHTML = currentProject.events.map(ev => `
+        <div class="bg-slate-900 border border-slate-800 p-2.5 rounded-lg flex justify-between items-center">
+          <div>
+            <div class="font-bold text-white">${ev.name}</div>
+            <div class="text-[10px] text-slate-400">${ev.category}</div>
+          </div>
+          <span class="font-mono bg-blue-600/20 text-blue-400 px-2 py-0.5 rounded text-[10px]">${ev.timestamp}</span>
+        </div>
+      `).join('');
+    }
+
+    function exportReportPDF() {
+      alert(`Generando dossier táctico para "${currentProject ? currentProject.name : 'Proyecto'}" con marca de agua de ${systemSettings.clubName}...`);
     }
   </script>
 </body>
